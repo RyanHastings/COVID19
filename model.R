@@ -25,7 +25,8 @@ Tinc<-5.2; # duration of incubation
 
 maxt<-300;
 
-outfile<-"R0_2.6_Rt_1.5_Rd_2.csv"
+model_outfile<-"R0_2.2_Rdxn_0.5_Rd_2.csv"
+param_outfile<-"R0_2.2_Rdxn_0.5_Rd_2_param.txt"
 output<-0 # 1 for yes, 0 for no
 pic1<-"Marion_R2.2_50p.png"
 tit1<-"Marion, R0=2.2, 50% reduction"
@@ -95,6 +96,11 @@ new_hosp<-matrix(0.0,nrow=92,ncol=maxt)
 total_infected<-rep(0,92)
 
 crit<-matrix(0.0,nrow=92,ncol=maxt)
+
+Ecum<-matrix(0.0,nrow=92,ncol=maxt)
+Icum<-matrix(0.0,nrow=92,ncol=maxt)
+Hcum<-matrix(0.0,nrow=92,ncol=maxt)
+critcum<-matrix(0.0,nrow=92,ncol=maxt)
 
 #################################################
 # run the model
@@ -196,115 +202,60 @@ ggsave(pic3)
 # 
 # colname1<-paste(county_names[1],"Exposed",sep=",")
 
-
 if (output==1) {
 
-df<-data.frame("County Names"=county_names[1],"Variable"="Susceptible")
-for (t in 1:maxt) {
-  #colname<-paste("Day",toString(t))
-  df<-df%>%bind_cols(day=round(S[1,t]))
-}
-i<-1
+  countycol<-rep(county_names[1],maxt)
+  daycol<-seq(1,maxt)
 
-df2<-data.frame("County Names"=county_names[1],"Variable"="Exposed")
-for (t in 1:maxt){
-  #colname<-paste("Day",toString(t))
-  df2<-df2%>%bind_cols(day=round(E[1,t]))
-}
-df<-df%>%bind_rows(df2)
+  df<-data.frame("County"=countycol,"Day"=daycol,
+                 "Susceptible"=S[1,],
+                 "Exposed"=E[1,],
+                 "ExposedCumulative"=Ecum[1,],
+                 "InfectedNotHospitalized"=In[1,],
+                 "InfectedCumulative"=Icum[1,],
+                 "Hospitalized"=H[1,],
+                 "HospitalizedCumulative"=Hcum[1,],
+                 "Critical"=crit[1,],
+                 "CriticalCumulative"=critcum[1,],
+                 "Deceased"=D[1,])
 
-df2<-data.frame("County Names"=county_names[1],"Variable"="Infected, not Hospitalized")
-for (t in 1:maxt){
-  #colname<-paste("Day",toString(t))
-  df2<-df2%>%bind_cols(day=round(In[1,t]))
-}
-df<-df%>%bind_rows(df2)
-
-df2<-data.frame("County Names"=county_names[1],"Variable"="Hospitalized, Non-critical")
-for (t in 1:maxt){
-  #colname<-paste("Day",toString(t))
-  df2<-df2%>%bind_cols(day=round(0.95*H[1,t]))
-}
-df<-df%>%bind_rows(df2)
-
-df2<-data.frame("County Names"=county_names[1],"Variable"="Hospitalized, Critical")
-for (t in 1:maxt){
-  #colname<-paste("Day",toString(t))
-  df2<-df2%>%bind_cols(day=round(crit[1,t]))
-}
-df<-df%>%bind_rows(df2)
-
-df2<-data.frame("County Names"=county_names[1],"Variable"="Recovered")
-for (t in 1:maxt){
-  #colname<-paste("Day",toString(t))
-  df2<-df2%>%bind_cols(day=round(R[1,t]))
-}
-df<-df%>%bind_rows(df2)
-
-df2<-data.frame("County Names"=county_names[1],"Variable"="Deceased")
-for (t in 1:maxt){
-  #colname<-paste("Day",toString(t))
-  df2<-df2%>%bind_cols(day=round(D[1,t]))
-}
-df<-df%>%bind_rows(df2)
-
-for (i in 2:92) {
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Susceptible")
-  for (t in 1:maxt) {
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(S[i,t]))
+  for (i in 2:92) {
+  
+    countycol<-rep(county_names[i],maxt)
+    df2<-data.frame("County"=countycol,"Day"=daycol,
+                    "Susceptible"=S[i,],
+                    "Exposed"=E[i,],
+                    "ExposedCumulative"=Ecum[i,],
+                    "InfectedNotHospitalized"=In[i,],
+                    "InfectedCumulative"=Icum[i,],
+                    "Hospitalized"=H[i,],
+                    "HospitalizedCumulative"=Hcum[i,],
+                    "Critical"=crit[i,],
+                    "CriticalCumulative"=critcum[i,],
+                    "Deceased"=D[i,])
+    df<-df%>%bind_rows(df2)
+  
   }
-  df<-df%>%bind_rows(df2)
-  
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Exposed")
-  for (t in 1:maxt){
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(E[i,t]))
-  }
-  df<-df%>%bind_rows(df2)
-  
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Infected, not Hospitalized")
-  for (t in 1:maxt){
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(In[i,t]))
-  }
-  df<-df%>%bind_rows(df2)
-  
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Hospitalized, Not critical")
-  for (t in 1:maxt){
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(0.95*H[i,t]))
-  }
-  df<-df%>%bind_rows(df2)
-  
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Hospitalized, Critical")
-  for (t in 1:maxt){
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(crit[i,t]))
-  }
-  df<-df%>%bind_rows(df2)
-  
-  
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Recovered")
-  for (t in 1:maxt){
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(R[i,t]))
-  }
-  df<-df%>%bind_rows(df2)
-  
-  df2<-data.frame("County Names"=county_names[i],"Variable"="Deceased")
-  for (t in 1:maxt){
-    #colname<-paste("Day",toString(t))
-    df2<-df2%>%bind_cols(day=round(D[i,t]))
-  }
-  df<-df%>%bind_rows(df2)
-  
-  
-  
-  
-  
+
+  write_csv(df,model_outfile)
+
+  sink(param_outfile)
+  cat(paste("outfile=",model_outfile))
+  cat(paste("R0=",R0))
+  cat(paste("intervention_R_rdxn=",intervention_R_rdxn))
+  cat(paste("intervention_time=",intervention_time))
+  cat(paste("lift_time=",lift_time))
+  cat(paste("Pinf=",Pinf))
+  cat(paste("Rdeath=",Rdeath))
+  cat(paste("Rhosp=",Rhosp))
+  cat(paste("Trecov=",Trecov))
+  cat(paste("Thosp=",Thosp))
+  cat(paste("Tdeath=",Tdeath))
+  cat(paste("crit_rate=",crit_rate))
+  cat(paste("Tinc=",Tinc))
+  cat(paste("Tinf=",Tinf))
+  cat(paste("maxt=",maxt))
+  sink()
   
 }
 
-  write_csv(df,outfile)
-}
