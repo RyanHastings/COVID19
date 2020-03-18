@@ -138,55 +138,20 @@ for (t in 2:maxt) {
     D[i,t]<-D[i,t-1]+dDdt[i,t]
     crit[i,t]<-crit_rate*In[i,t]
     
+    # Cumulative values
+    Ecum[i,t]<-Ecum[i,t-1]-dSdt[i,t]
+    Icum[i,t]<-Icum[i,t-1]+E[i,t-1]/Tinc
+    Hcum[i,t]<-Hcum[i,t-1]+Rhosp*In[i,t-1]/Thosp
+    
+    
     if (R[i,t]>S[i,1]) {
       print("Error: More recovered than original population.")
       stop()
     }
     
+  }  
     
-    
-    # if (t > Thosp) {
-    #   new_hosp[i,t]<-max(c(0,Rhosp*dIdt[i,t-Thosp]))
-    # } else {
-    #   new_hosp[i,t]<-0
-    # }
-    # In[i,t]<-In[i,t]-new_hosp[i,t]
-    # if (t > Thosp+Trecov) {
-    #   recovered<-(1-Rdeath)*new_hosp[i,t-Trecov]
-    # } else {
-    #   recovered<-0
-    # }
-    # R[i,t]<-R[i,t]+recovered
-    # if (t > Thosp+Tdeath) {
-    #   dead<-Rdeath*new_hosp[i,t-Tdeath]
-    # } else {
-    #   dead<-0
-    # }
-    # Nhosp[i,t]<-Nhosp[i,t-1]+
-    #   new_hosp[i,t]-
-    #   recovered-
-    #   dead
-    # 
-    # Ndead[i,t]<-Ndead[i,t-1]+dead
-    # 
-  }
-  
 }
-
-# dum<-data.frame(S=round(S[1,]),
-#                 E=round(E[1,]),
-#                 I=round(In[1,]),
-#                 R=round(R[1,]),
-#                 H=round(H[1,]),
-#                 D=round(D[1,]),
-#                 t=(1:300))
-# print( ggplot(dum,aes(x=t))+
-#          geom_line(aes(y=S,color='S'))+
-#          geom_line(aes(y=E,color='E'))+
-#          geom_line(aes(y=I,color='I'))+
-#          geom_line(aes(y=R,color='R'))+
-#          geom_line(aes(y=H,color='H'))+
-#          geom_line(aes(y=D,color='D')))
 
 df.Marion<-data.frame("I"=In[49,],"H"=H[49,],"crit"=crit[49,],"D"=D[49,],"t"=(1:maxt))
 df.Monroe<-data.frame("I"=In[53,],"H"=H[53,],"crit"=crit[53,],"D"=D[53,],"t"=(1:maxt))
