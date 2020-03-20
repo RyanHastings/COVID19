@@ -31,7 +31,7 @@ library(readxl)
 datadir<-'../../COVID19Response/'
 outdir<-'../../COVID19Response/'
 
-R0<-2.2 # rate of infection for exposed people
+R0<-2.6 # rate of infection for exposed people
 intervention_R_rdxn<-0.0 # % reduction in R after intervention
 intervention_time<-40 # intervention time (days)
 lift_time<-300 # time at which intervention is ceased
@@ -41,7 +41,7 @@ Rdeath<-0.01 # death rate per infected (if model_by_age==0)
 Rhosp<-0.15 # hospitalization rate per infected (if model_by_age==0)
 Trecov<-23; # time (days) between indeterminate hospitalization and recovery
 Thosp=5; # time of indeterminate hospitalization
-Tdeath=27; # time (days) between indeterminate hospitalization and death
+Tdeath=13; # time (days) between indeterminate hospitalization and death
 crit_rate=0.05; # % of infectious that become critically hospitalized
 
 Tinf<-2.9; # duration of infection (not including hospitalization)
@@ -76,19 +76,19 @@ Rdeath_maligneoplasm<-0.056
 Rdeath_copd<-0.063
 
 maxt<-300 # Max time to simulate (days)
-ncounties<-ncounties # number of counties
+ncounties<-92 # number of counties
 
-output<-0 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
+output<-1 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
           # the values as columns and a file containing all of the parameter settings
-model_outfile<-"Marion_R2.2_50p_Rdeath0.01.csv" # name of model output
-param_outfile<-"Marion_R2.2_50p_Rdeath0.01.txt" # name of parameter file
+model_outfile<-"Scenario_R2.6_0rdxn_Both.csv" # name of model output
+param_outfile<-"Scenario_R2.6_0rdxn_Both_params.txt" # name of parameter file
   #notes to include in parameter text file
 param_notes<-"No county-county transmission, all counties seeded with one case."
 
 # names for some plots that are produced...these are Indiana-specific and will
 # require modification for your state.
-pic1<-"Marion_R2.2_50p_Rdeath0.01.png"
-tit1<-"Marion, R0=2.2, 50% reduction"
+pic1<-"Marion_R2.6_0rdxn_Both.png"
+tit1<-"Marion, R0=2.6, no reduction, both"
 pic2<-"Monre_R2.2_50p.png"
 tit2<-"Monroe, R0=2.2, 50% reduction"
 pic3<-"Lake_R2.2_no_50p.png"
@@ -208,10 +208,12 @@ if (model_by_age==0) {
 
 comorbid_hosp<-rep(1.0,ncounties)
 comorbid_death<-rep(1.0,ncounties)
+comorbid_hosp_over60<-rep(1.0,ncounties)
+comorbid_death_over60<-rep(1.0,ncounties)
 
 if (model_comorbidities==1) {
   
-  comorbid_pop<-read_excel(paste(datadir,"Hospitalizations with comorbidities.xlsx"),
+  comorbid_pop<-read_excel(paste(datadir,"Hospitalizations with comorbidities.xlsx",sep=""),
                            sheet="Percents")
   
   if (model_by_age==0) {
@@ -712,9 +714,9 @@ print(ggplot(df.Marion,aes(x=t))+
         geom_line(aes(y=D,color="deceased"))+
         ggtitle(tit1)+
         scale_x_continuous(breaks=seq(0,300,30),name="days")+
-        scale_y_continuous(breaks=seq(0,80000,2000),name="number")+
+        scale_y_continuous(breaks=seq(0,190000,2000),name="number")+
         theme(axis.text.x=element_text(angle=90)) )
-ggsave(paste(outdir,pic1))
+ggsave(paste(outdir,pic1,sep=""))
 
 # print(ggplot(df.Monroe,aes(x=t))+
 #         geom_line(aes(y=I,color="infected"))+
@@ -776,9 +778,9 @@ if (output==1) {
   
   }
 
-  write_csv(df1,paste(outdir,model_outfile))
+  write_csv(df1,paste(outdir,model_outfile,sep=""))
 
-  sink(paste(outdir,param_outfile))
+  sink(paste(outdir,param_outfile,sep=""))
   cat(paste("outfile=",model_outfile))
   cat("\n")
   cat(paste("R0=",R0))
@@ -791,7 +793,7 @@ if (output==1) {
   cat("\n")
   cat(paste("Pinf=",Pinf))
   cat("\n")
-  cat(paste("Rdeath=",Rdeath))
+  cat(paste("Rdeath=",Rdeath*Rhosp))
   cat("\n")
   cat(paste("Rhosp=",Rhosp))
   cat("\n")
@@ -811,19 +813,19 @@ if (output==1) {
   cat("\n")
   cat(paste("model_by_age=",model_by_age))
   cat("\n")
-  cat(paste("Rdeath_10to19=",Rdeath_10to19))
+  cat(paste("Rdeath_10to19=",Rdeath_10to19*Rhosp_10to19))
   cat("\n")
-  cat(paste("Rdeath_20to39=",Rdeath_20to39))
+  cat(paste("Rdeath_20to39=",Rdeath_20to39*Rhosp_20to39))
   cat("\n")
-  cat(paste("Rdeath_40to49=",Rdeath_40to49))
+  cat(paste("Rdeath_40to49=",Rdeath_40to49*Rhosp_40to49))
   cat("\n")
-  cat(paste("Rdeath_50to59=",Rdeath_50to59))
+  cat(paste("Rdeath_50to59=",Rdeath_50to59*Rhosp_50to59))
   cat("\n")
-  cat(paste("Rdeath_60to69=",Rdeath_60to69))
+  cat(paste("Rdeath_60to69=",Rdeath_60to69*Rhosp_60to69))
   cat("\n")
-  cat(paste("Rdeath_70to79=",Rdeath_70to79))
+  cat(paste("Rdeath_70to79=",Rdeath_70to79*Rhosp_70to79))
   cat("\n")
-  cat(paste("Rdeath_80plus=",Rdeath_80plus))
+  cat(paste("Rdeath_80plus=",Rdeath_80plus*Rhosp_80plus))
   cat("\n")
   cat(paste("Rhosp_10to19=",Rhosp_10to19))
   cat("\n")
