@@ -36,6 +36,7 @@ library(readxl)
 datadir<-'../../COVID19Response/'
 outdir<-'../../COVID19Response/'
 
+<<<<<<< HEAD
 ### The next few lines are for processing a number of scenarios at once
 # for (R0 in c(2.0,2.2,2.4,2.6)) {
 # for (intervention_R_rdxn in c(0.0, 0.25, 0.5)) {
@@ -57,6 +58,9 @@ outdir<-'../../COVID19Response/'
 #                      10*intervention_R_rdxn,"rdxn_",tag,"_param.txt",sep="")
 
 R0<-2.2 # rate of infection for exposed people
+=======
+R0<-2.6 # rate of infection for exposed people
+>>>>>>> parent of ea63aa9... added flowchart
 intervention_R_rdxn<-0.0 # % reduction in R after intervention
 intervention_time<-40 # intervention time (days)
 lift_time<-300 # time at which intervention is ceased
@@ -87,7 +91,7 @@ Rhosp_60to69<-0.223
 Rhosp_70to79<-0.223
 Rhosp_80plus<-0.223
 
-model_comorbidities<-0 # Include comorbidities, or no, 0=no, 1=yes
+model_comorbidities<-1 # Include comorbidities, or no, 0=no, 1=yes
 Rhosp_diabetes<-0.073 # Rate of hospitalization
 Rhosp_heartdisease<-0.105
 Rhosp_hypertension<-0.06
@@ -104,15 +108,15 @@ ncounties<-92 # number of counties
 
 output<-0 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
           # the values as columns and a file containing all of the parameter settings
-model_outfile<-"Scenario_R2.6_50rdxn_AgeOnly.csv" # name of model output
-param_outfile<-"Scenario_R2.6_50rdxn_AgeOnly_params.txt" # name of parameter file
+model_outfile<-"Scenario_R2.6_0rdxn_Both.csv" # name of model output
+param_outfile<-"Scenario_R2.6_0rdxn_Both_params.txt" # name of parameter file
   #notes to include in parameter text file
 param_notes<-"No county-county transmission, all counties seeded with one case."
 
 # names for some plots that are produced...these are Indiana-specific and will
 # require modification for your state.
-pic1<-"Marion_R2.6_50rdxn_AgeOnly.png"
-tit1<-"Marion, R0=2.6, 50% reduction, age only"
+pic1<-"Marion_R2.6_0rdxn_Both.png"
+tit1<-"Marion, R0=2.6, no reduction, both"
 pic2<-"Monre_R2.2_50p.png"
 tit2<-"Monroe, R0=2.2, 50% reduction"
 pic3<-"Lake_R2.2_no_50p.png"
@@ -817,7 +821,7 @@ print(ggplot(df.Marion,aes(x=t))+
         #geom_line(aes(y=G,color="G"))+
         ggtitle(tit1)+
         scale_x_continuous(breaks=seq(0,300,30),name="days")+
-      #  scale_y_continuous(breaks=seq(0,190000,2000),name="number")+
+        scale_y_continuous(breaks=seq(0,190000,2000),name="number")+
         theme(axis.text.x=element_text(angle=90)) )
 ggsave(paste(outdir,pic1,sep=""))
 
