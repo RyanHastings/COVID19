@@ -684,6 +684,14 @@ for (t in 2:maxt) {
       Hcum_60to69[i,t]<-Hcum_60to69[i,t-1]+Rhosp_60to69*I_60to69[i,t-1]/Thosp
       Hcum_70to79[i,t]<-Hcum_70to79[i,t-1]+Rhosp_70to79*I_70to79[i,t-1]/Thosp
       Hcum_80plus[i,t]<-Hcum_80plus[i,t-1]+Rhosp_80plus*I_80plus[i,t-1]/Thosp
+      
+      critcum_10to19[i,t]<-critcum_10to19[i,t-1]+(crit_rate)*I_10to19[i,t-1]/Thosp
+      critcum_20to39[i,t]<-critcum_20to39[i,t-1]+(crit_rate)*I_20to39[i,t-1]/Thosp
+      critcum_40to49[i,t]<-critcum_40to49[i,t-1]+(crit_rate)*I_40to49[i,t-1]/Thosp
+      critcum_50to59[i,t]<-critcum_50to59[i,t-1]+(crit_rate)*I_50to59[i,t-1]/Thosp
+      critcum_60to69[i,t]<-critcum_60to69[i,t-1]+(crit_rate)*I_60to69[i,t-1]/Thosp
+      critcum_70to79[i,t]<-critcum_70to79[i,t-1]+(crit_rate)*I_70to79[i,t-1]/Thosp
+      critcum_80to89[i,t]<-critcum_80to89[i,t-1]+(crit_rate)*I_80to89[i,t-1]/Thosp
   }
 }  
 
