@@ -10,6 +10,11 @@
 ###############################################################
 # Ryan Hastings, 19 March 2020
 ###############################################################
+# Updated equation set to be correct, 25 March 2020
+#    Known bug:  Recovery numbers are way too low.  Every other
+#      number appears correct, though, and the other numbers
+#      are what we care about for disaster planning.
+###############################################################
 
 ###############################################################
 # PREAMBLE
@@ -31,23 +36,42 @@ library(readxl)
 datadir<-'../../COVID19Response/'
 outdir<-'../../COVID19Response/'
 
-R0<-2.6 # rate of infection for exposed people
-intervention_R_rdxn<-0.5 # % reduction in R after intervention
+### The next few lines are for processing a number of scenarios at once
+# for (R0 in c(2.0,2.2,2.4,2.6)) {
+# for (intervention_R_rdxn in c(0.0, 0.25, 0.5)) {
+# for (model_by_age in c(0,1,1)) {
+# for (model_comorbidities in c(1,0,1)) {
+# 
+# if (model_by_age==0 & model_comorbidities==1) {
+#   tag<-"ComorbidOnly"
+# } else if (model_by_age==1 & model_comorbidities==0) {
+#   tag<-"AgeOnly"
+# } else if (model_by_age==1 & model_comorbidities==1) {
+#   tag<-"Both"
+# }
+#   
+# model_outfile<-paste("Scenario_R",format(R0,nsmall=1),"_",
+#   10*intervention_R_rdxn,"rdxn_",tag,".csv",sep="")
+# print(model_outfile)
+# param_outfile<-paste("Scenario_R",format(R0,nsmall=1),"_",
+#                      10*intervention_R_rdxn,"rdxn_",tag,"_param.txt",sep="")
+
+R0<-2.2 # rate of infection for exposed people
+intervention_R_rdxn<-0.0 # % reduction in R after intervention
 intervention_time<-40 # intervention time (days)
 lift_time<-300 # time at which intervention is ceased
 Pinf<-1.0 # proportion of population we expect to be nonresistant
 
 Rdeath<-0.01 # death rate per infected (if model_by_age==0)
 Rhosp<-0.15 # hospitalization rate per infected (if model_by_age==0)
-Trecov<-23; # time (days) between indeterminate hospitalization and recovery
-Thosp=5; # time of indeterminate hospitalization
-Tdeath=13; # time (days) between indeterminate hospitalization and death
-crit_rate=0.05; # % of infectious that become critically hospitalized
+Trecov<-28; # time (days) between hospitalization and recovery
+Tdeath<-21; # time (days) between indeterminate hospitalization and death
+Rcrit<-0.05; # % of infectious that become critically hospitalized
 
 Tinf<-2.9; # duration of infection (not including hospitalization)
 Tinc<-5.2; # duration of incubation
 
-model_by_age<-1 # Include age demographics or not, 0=no, 1=yes
+model_by_age<-0 # Include age demographics or not, 0=no, 1=yes
 Rdeath_10to19<-0.002 # Death rate per infected for age groups
 Rdeath_20to39<-0.002
 Rdeath_40to49<-0.004
@@ -78,7 +102,7 @@ Rdeath_copd<-0.063
 maxt<-300 # Max time to simulate (days)
 ncounties<-92 # number of counties
 
-output<-1 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
+output<-0 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
           # the values as columns and a file containing all of the parameter settings
 model_outfile<-"Scenario_R2.6_50rdxn_AgeOnly.csv" # name of model output
 param_outfile<-"Scenario_R2.6_50rdxn_AgeOnly_params.txt" # name of parameter file
@@ -274,6 +298,16 @@ if (model_comorbidities==1) {
 # This just initializes a bunch of matricies and arrays
 # that will be used by the model.  Probably not much to worry about
 # here.
+
+if (Tdeath>Trecov) {
+  Tcrit<-0.5*Trecov
+} else {
+  Tcrit<-0.5*Tdeath
+}
+
+Trecovcrit<-Trecov-Tcrit
+Tdeath<-Tdeath-Tcrit
+
 if (model_by_age==0) {
   dSdt<-matrix(0.0,nrow=ncounties,ncol=maxt)
 
@@ -288,10 +322,16 @@ if (model_by_age==0) {
   H<-matrix(0,nrow=ncounties,ncol=maxt)
   dHdt<-matrix(0,nrow=ncounties,ncol=maxt)
 
+  Q<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQdt<-matrix(0,nrow=ncounties,ncol=maxt)
+  
+  G<-matrix(0,nrow=ncounties,ncol=maxt)
+  dGdt<-matrix(0,nrow=ncounties,ncol=maxt)
+  
   D<-matrix(0,nrow=ncounties,ncol=maxt)
   dDdt<-matrix(0,nrow=ncounties,ncol=maxt)
 
-  Rdeath<-Rdeath/Rhosp
+  Rdeath<-Rdeath/Rcrit
 
   crit<-matrix(0.0,nrow=ncounties,ncol=maxt)
   dcritdt<-matrix(0.0,nrow=ncounties,ncol=maxt)
@@ -300,6 +340,8 @@ if (model_by_age==0) {
   Icum<-matrix(0.0,nrow=ncounties,ncol=maxt)
   Hcum<-matrix(0.0,nrow=ncounties,ncol=maxt)
   critcum<-matrix(0.0,nrow=ncounties,ncol=maxt)
+  Gcum<-matrix(0.0,nrow=ncounties,ncol=maxt)
+  Qcum<-matrix(0.0,nrow=ncounties,ncol=maxt)
 
 } else if (model_by_age==1) {
   
@@ -357,14 +399,46 @@ if (model_by_age==0) {
   D<-matrix(0,nrow=ncounties,ncol=maxt)
   dDdt<-matrix(0,nrow=ncounties,ncol=maxt)
   
-  Rdeath_10to19<-Rdeath_10to19/Rhosp_10to19
-  Rdeath_20to39<-Rdeath_20to39/Rhosp_20to39
-  Rdeath_40to49<-Rdeath_40to49/Rhosp_40to49
-  Rdeath_50to59<-Rdeath_50to59/Rhosp_50to59
-  Rdeath_60to69<-Rdeath_60to69/Rhosp_60to69
-  Rdeath_70to79<-Rdeath_70to79/Rhosp_70to79
-  Rdeath_80plus<-Rdeath_80plus/Rhosp_80plus
-
+  Rdeath_10to19<-Rdeath_10to19/Rcrit
+  Rdeath_20to39<-Rdeath_20to39/Rcrit
+  Rdeath_40to49<-Rdeath_40to49/Rcrit
+  Rdeath_50to59<-Rdeath_50to59/Rcrit
+  Rdeath_60to69<-Rdeath_60to69/Rcrit
+  Rdeath_70to79<-Rdeath_70to79/Rcrit
+  Rdeath_80plus<-Rdeath_80plus/Rcrit
+  
+  G_10to19<-matrix(0,nrow=ncounties,ncol=maxt)
+  G_20to39<-matrix(0,nrow=ncounties,ncol=maxt)
+  G_40to49<-matrix(0,nrow=ncounties,ncol=maxt)
+  G_50to59<-matrix(0,nrow=ncounties,ncol=maxt)
+  G_60to69<-matrix(0,nrow=ncounties,ncol=maxt)
+  G_70to79<-matrix(0,nrow=ncounties,ncol=maxt)
+  G_80plus<-matrix(0,nrow=ncounties,ncol=maxt)
+  
+  dG_10to19dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dG_20to39dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dG_40to49dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dG_50to59dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dG_60to69dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dG_70to79dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dG_80plusdt<-matrix(0,nrow=ncounties,ncol=maxt)
+  
+  Q_10to19<-matrix(0,nrow=ncounties,ncol=maxt)
+  Q_20to39<-matrix(0,nrow=ncounties,ncol=maxt)
+  Q_40to49<-matrix(0,nrow=ncounties,ncol=maxt)
+  Q_50to59<-matrix(0,nrow=ncounties,ncol=maxt)
+  Q_60to69<-matrix(0,nrow=ncounties,ncol=maxt)
+  Q_70to79<-matrix(0,nrow=ncounties,ncol=maxt)
+  Q_80plus<-matrix(0,nrow=ncounties,ncol=maxt)
+  
+  dQ_10to19dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQ_20to39dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQ_40to49dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQ_50to59dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQ_60to69dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQ_70to79dt<-matrix(0,nrow=ncounties,ncol=maxt)
+  dQ_80plusdt<-matrix(0,nrow=ncounties,ncol=maxt)
+  
   crit_10to19<-matrix(0.0,nrow=ncounties,ncol=maxt)
   crit_20to39<-matrix(0.0,nrow=ncounties,ncol=maxt)
   crit_40to49<-matrix(0.0,nrow=ncounties,ncol=maxt)
@@ -439,38 +513,41 @@ for (t in 2:maxt) {
       }
       dEdt[i,t]<--dSdt[i,t]-E[i,t-1]/Tinc
 
-      dIdt[i,t]<-E[i,t-1]/Tinc-(1-Rhosp*comorbid_hosp[i])*In[i,t-1]/Tinf-
-        Rhosp*comorbid_hosp[i]*In[i,t-1]/Thosp
-      dHdt[i,t]<-Rhosp*comorbid_hosp[i]*In[i,t-1]/Thosp-
-        (1-Rdeath*comorbid_death[i])*H[i,t-1]/Trecov-
-        Rdeath*comorbid_death[i]*H[i,t-1]/Tdeath
+      dIdt[i,t]<-E[i,t-1]/Tinc-In[i,t-1]/Tinf
+      dHdt[i,t]<-(Rhosp-Rcrit)*comorbid_hosp[i]*In[i,t-1]/Tinf-
+        H[i,t-1]/Trecov
+      dcritdt[i,t]<-Rcrit*comorbid_hosp[i]*In[i,t-1]/Tinf-
+        crit[i,t-1]/Tcrit
+      dGdt[i,t]<-Rdeath*comorbid_death[i]*crit[i,t-1]/Tcrit-
+        G[i,t-1]/Tdeath
+      dQdt[i,t]<-(1-Rdeath*comorbid_death[i])*crit[i,t-1]/Tcrit-
+        Q[i,t-1]/Trecovcrit
       dRdt[i,t]<-(1-Rhosp*comorbid_hosp[i])*In[i,t-1]/Tinf+
-        (1-Rdeath*comorbid_death[i])*H[i,t-1]/Trecov
-      dDdt[i,t]<-Rdeath*comorbid_death[i]*H[i,t-1]/Tdeath
+        Q[i,t-1]/Trecovcrit
+      dDdt[i,t]<-G[i,t-1]/Tdeath
     
-      dcritdt[i,t]<-(crit_rate)*In[i,t-1]/Thosp -
-        (1-Rdeath*comorbid_death[i])*crit[i,t-1]/Trecov -
-        Rdeath*comorbid_death[i]*crit[i,t-1]/Tdeath
-    
+
       S[i,t]<-S[i,t-1]+dSdt[i,t]
       E[i,t]<-E[i,t-1]+dEdt[i,t]
       In[i,t]<-In[i,t-1]+dIdt[i,t]
       R[i,t]<-R[i,t-1]+dRdt[i,t]
-    
       H[i,t]<-H[i,t-1]+dHdt[i,t]
       D[i,t]<-D[i,t-1]+dDdt[i,t]
       crit[i,t]<-crit[i,t-1]+dcritdt[i,t]
-    
+      Q[i,t]<-Q[i,t-1]+dQdt[i,t]
+      G[i,t]<-G[i,t-1]+dGdt[i,t]
       # Cumulative values
       Ecum[i,t]<-Ecum[i,t-1]-dSdt[i,t]
       Icum[i,t]<-Icum[i,t-1]+E[i,t-1]/Tinc
-      Hcum[i,t]<-Hcum[i,t-1]+Rhosp*comorbid_hosp[i]*In[i,t-1]/Thosp
+      Hcum[i,t]<-Hcum[i,t-1]+(Rhosp-Rcrit)*comorbid_hosp[i]*In[i,t-1]/Tinf
+      critcum[i,t]<-critcum[i,t-1]+Rcrit*comorbid_hosp[i]*In[i,t-1]/Tinf
+      Qcum[i,t]<-Qcum[i,t-1]+Rdeath*comorbid_death[i]*crit[i,t-1]/Tcrit
+      Gcum[i,t]<-Gcum[i,t-1]+(1-Rdeath)*comorbid_death[i]*crit[i,t-1]/Tcrit
     
-    
-      if (R[i,t]>S[i,1]) {
-        print("Error: More recovered than original population.")
-        stop()
-      }
+      #if (R[i,t]>S[i,1]) {
+      #  print("Error: More recovered than original population.")
+      #  stop()
+      #}
     }
   } else {
       
@@ -521,94 +598,88 @@ for (t in 2:maxt) {
         E_80plus[i,t-1]/Tinc
       
       dI_10to19dt[i,t]<-E_10to19[i,t-1]/Tinc -
-        (1-Rhosp_10to19*comorbid_hosp[i])*I_10to19[i,t-1]/Tinf -
-        Rhosp_10to19*comorbid_hosp[i]*I_10to19[i,t-1]/Thosp
+        I_10to19[i,t-1]/Tinf
       dI_20to39dt[i,t]<-E_20to39[i,t-1]/Tinc -
-        (1-Rhosp_20to39*comorbid_hosp[i])*I_20to39[i,t-1]/Tinf -
-        Rhosp_20to39*comorbid_hosp[i]*I_20to39[i,t-1]/Thosp
+        I_20to39[i,t-1]/Tinf
       dI_40to49dt[i,t]<-E_40to49[i,t-1]/Tinc -
-        (1-Rhosp_40to49*comorbid_hosp[i])*I_40to49[i,t-1]/Tinf -
-        Rhosp_40to49*comorbid_hosp[i]*I_40to49[i,t-1]/Thosp
+        I_40to49[i,t-1]/Tinf
       dI_50to59dt[i,t]<-E_50to59[i,t-1]/Tinc -
-        (1-Rhosp_50to59*comorbid_hosp[i])*I_50to59[i,t-1]/Tinf -
-        Rhosp_50to59*comorbid_hosp[i]*I_50to59[i,t-1]/Thosp
+        I_50to59[i,t-1]/Tinf
       dI_60to69dt[i,t]<-E_60to69[i,t-1]/Tinc -
-        (1-Rhosp_60to69*comorbid_hosp_over60[i])*I_60to69[i,t-1]/Tinf -
-        Rhosp_60to69*comorbid_hosp_over60[i]*I_60to69[i,t-1]/Thosp
+        I_60to69[i,t-1]/Tinf
       dI_70to79dt[i,t]<-E_70to79[i,t-1]/Tinc -
-        (1-Rhosp_70to79*comorbid_hosp_over60[i])*I_70to79[i,t-1]/Tinf -
-        Rhosp_70to79*comorbid_hosp_over60[i]*I_70to79[i,t-1]/Thosp
+        I_70to79[i,t-1]/Tinf
       dI_80plusdt[i,t]<-E_80plus[i,t-1]/Tinc -
-        (1-Rhosp_80plus*comorbid_hosp_over60[i])*I_80plus[i,t-1]/Tinf -
-        Rhosp_80plus*comorbid_hosp_over60[i]*I_80plus[i,t-1]/Thosp
+        I_80plus[i,t-1]/Tinf
       
-      dH_10to19dt[i,t]<-Rhosp_10to19*comorbid_hosp[i]*I_10to19[i,t-1]/Thosp -
-        (1-Rdeath_10to19*comorbid_death[i])*H_10to19[i,t-1]/Trecov -
-        Rdeath_10to19*comorbid_death[i]*H_10to19[i,t-1]/Tdeath
-      dH_20to39dt[i,t]<-Rhosp_20to39*comorbid_hosp[i]*I_20to39[i,t-1]/Thosp -
-        (1-Rdeath_20to39*comorbid_death[i])*H_20to39[i,t-1]/Trecov -
-        Rdeath_20to39*comorbid_death[i]*H_20to39[i,t-1]/Tdeath
-      dH_40to49dt[i,t]<-Rhosp_40to49*comorbid_hosp[i]*I_40to49[i,t-1]/Thosp -
-        (1-Rdeath_40to49*comorbid_death[i])*H_40to49[i,t-1]/Trecov -
-        Rdeath_40to49*comorbid_death[i]*H_40to49[i,t-1]/Tdeath
-      dH_50to59dt[i,t]<-Rhosp_50to59*comorbid_hosp[i]*I_50to59[i,t-1]/Thosp -
-        (1-Rdeath_50to59*comorbid_death[i])*H_50to59[i,t-1]/Trecov -
-        Rdeath_50to59*comorbid_death[i]*H_50to59[i,t-1]/Tdeath
-      dH_60to69dt[i,t]<-Rhosp_60to69*comorbid_hosp_over60[i]*I_60to69[i,t-1]/Thosp -
-        (1-Rdeath_60to69*comorbid_death_over60[i])*H_60to69[i,t-1]/Trecov -
-        Rdeath_60to69*comorbid_death_over60[i]*H_60to69[i,t-1]/Tdeath
-      dH_70to79dt[i,t]<-Rhosp_70to79*comorbid_hosp_over60[i]*I_70to79[i,t-1]/Thosp -
-        (1-Rdeath_70to79*comorbid_death_over60[i])*H_70to79[i,t-1]/Trecov -
-        Rdeath_70to79*comorbid_death_over60[i]*H_70to79[i,t-1]/Tdeath
-      dH_80plusdt[i,t]<-Rhosp_80plus*comorbid_death_over60[i]*I_80plus[i,t-1]/Thosp -
-        (1-Rdeath_80plus*comorbid_death_over60[i])*H_80plus[i,t-1]/Trecov -
-        Rdeath_80plus*comorbid_death_over60[i]*H_80plus[i,t-1]/Tdeath
+      dH_10to19dt[i,t]<-(Rhosp_10to19-Rcrit)*comorbid_hosp[i]*I_10to19[i,t-1]/Tinf -
+        H_10to19[i,t-1]/Trecov
+      dH_20to39dt[i,t]<-(Rhosp_20to39-Rcrit)*comorbid_hosp[i]*I_20to39[i,t-1]/Tinf -
+        H_20to39[i,t-1]/Trecov
+      dH_40to49dt[i,t]<-(Rhosp_40to49-Rcrit)*comorbid_hosp[i]*I_40to49[i,t-1]/Tinf -
+        H_40to49[i,t-1]/Trecov
+      dH_50to59dt[i,t]<-(Rhosp_50to59-Rcrit)*comorbid_hosp[i]*I_50to59[i,t-1]/Tinf -
+        H_50to59[i,t-1]/Trecov
+      dH_60to69dt[i,t]<-(Rhosp_60to69-Rcrit)*comorbid_hosp_over60[i]*I_60to69[i,t-1]/Tinf -
+        H_60to69[i,t-1]/Trecov
+      dH_70to79dt[i,t]<-(Rhosp_70to79-Rcrit)*comorbid_hosp_over60[i]*I_70to79[i,t-1]/Tinf -
+        H_70to79[i,t-1]/Trecov
+      dH_80plusdt[i,t]<-(Rhosp_80plus-Rcrit)*comorbid_hosp_over60[i]*I_80plus[i,t-1]/Tinf -
+        H_80plus[i,t-1]/Trecov
       
-      dcrit_10to19dt[i,t]<-(crit_rate)*I_10to19[i,t-1]/Thosp -
-        (1-Rdeath_10to19*comorbid_death[i])*crit_10to19[i,t-1]/Trecov -
-        Rdeath_10to19*comorbid_death[i]*crit_10to19[i,t-1]/Tdeath
-      dcrit_20to39dt[i,t]<-(crit_rate)*I_20to39[i,t-1]/Thosp -
-        (1-Rdeath_20to39*comorbid_death[i])*crit_20to39[i,t-1]/Trecov -
-        Rdeath_20to39*comorbid_death[i]*crit_20to39[i,t-1]/Tdeath
-      dcrit_40to49dt[i,t]<-(crit_rate)*I_40to49[i,t-1]/Thosp -
-        (1-Rdeath_40to49*comorbid_death[i])*crit_40to49[i,t-1]/Trecov -
-        Rdeath_40to49*comorbid_death[i]*crit_40to49[i,t-1]/Tdeath
-      dcrit_50to59dt[i,t]<-(crit_rate)*I_50to59[i,t-1]/Thosp -
-        (1-Rdeath_50to59*comorbid_death[i])*crit_50to59[i,t-1]/Trecov -
-        Rdeath_50to59*comorbid_death[i]*crit_50to59[i,t-1]/Tdeath
-      dcrit_60to69dt[i,t]<-(crit_rate)*I_60to69[i,t-1]/Thosp -
-        (1-Rdeath_60to69*comorbid_death_over60[i])*crit_60to69[i,t-1]/Trecov -
-        Rdeath_60to69*comorbid_death_over60[i]*crit_60to69[i,t-1]/Tdeath
-      dcrit_70to79dt[i,t]<-(crit_rate)*I_70to79[i,t-1]/Thosp -
-        (1-Rdeath_70to79*comorbid_death_over60[i])*crit_70to79[i,t-1]/Trecov -
-        Rdeath_70to79*comorbid_death_over60[i]*H_70to79[i,t-1]/Tdeath
-      dcrit_80plusdt[i,t]<-(crit_rate)*I_80plus[i,t-1]/Thosp -
-        (1-Rdeath_80plus*comorbid_death_over60[i])*crit_80plus[i,t-1]/Trecov -
-        Rdeath_80plus*comorbid_death_over60[i]*crit_80plus[i,t-1]/Tdeath
+      dcrit_10to19dt[i,t]<-(Rcrit*comorbid_hosp[i])*I_10to19[i,t-1]/Tinf -
+        crit_10to19[i,t-1]/Tcrit
+      dcrit_20to39dt[i,t]<-(Rcrit*comorbid_hosp[i])*I_20to39[i,t-1]/Tinf -
+        crit_20to39[i,t-1]/Tcrit
+      dcrit_40to49dt[i,t]<-(Rcrit*comorbid_hosp[i])*I_40to49[i,t-1]/Tinf -
+        crit_40to49[i,t-1]/Tcrit
+      dcrit_50to59dt[i,t]<-(Rcrit*comorbid_hosp[i])*I_50to59[i,t-1]/Tinf -
+        crit_50to59[i,t-1]/Tcrit
+      dcrit_60to69dt[i,t]<-(Rcrit*comorbid_hosp_over60[i])*I_60to69[i,t-1]/Tinf -
+        crit_60to69[i,t-1]/Tcrit
+      dcrit_70to79dt[i,t]<-(Rcrit*comorbid_hosp_over60[i])*I_70to79[i,t-1]/Tinf -
+        crit_70to79[i,t-1]/Tcrit
+      dcrit_80plusdt[i,t]<-(Rcrit*comorbid_hosp_over60[i])*I_80plus[i,t-1]/Tinf -
+        crit_80plus[i,t-1]/Tcrit
       
-      #dRdt[i,t]<-(1-Rhosp)*In[i,t-1]/Tinf+(1-Rdeath)*H[i,t-1]/Trecov
-      dRdt[i,t]<-(1-Rhosp_10to19*comorbid_hosp[i])*I_10to19[i,t-1]/Tinf+
-        (1-Rdeath_10to19*comorbid_death[i])*H_10to19[i,t-1]/Trecov +
-        (1-Rhosp_20to39*comorbid_hosp[i])*I_20to39[i,t-1]/Tinf+
-        (1-Rdeath_20to39*comorbid_death[i])*H_20to39[i,t-1]/Trecov +
-        (1-Rhosp_40to49*comorbid_hosp[i])*I_40to49[i,t-1]/Tinf+
-        (1-Rdeath_40to49*comorbid_death[i])*H_40to49[i,t-1]/Trecov +
-        (1-Rhosp_50to59*comorbid_hosp[i])*I_50to59[i,t-1]/Tinf+
-        (1-Rdeath_50to59*comorbid_death[i])*H_50to59[i,t-1]/Trecov +
-        (1-Rhosp_60to69*comorbid_hosp_over60[i])*I_60to69[i,t-1]/Tinf+
-        (1-Rdeath_60to69*comorbid_death_over60[i])*H_60to69[i,t-1]/Trecov +
-        (1-Rhosp_70to79*comorbid_hosp_over60[i])*I_70to79[i,t-1]/Tinf+
-        (1-Rdeath_70to79*comorbid_death_over60[i])*H_70to79[i,t-1]/Trecov +
-        (1-Rhosp_80plus*comorbid_hosp_over60[i])*I_80plus[i,t-1]/Tinf+
-        (1-Rdeath_80plus*comorbid_death_over60[i])*H_80plus[i,t-1]/Trecov
-      #dDdt[i,t]<-Rdeath*H[i,t-1]/Tdeath
-      dDdt[i,t]<-Rdeath_10to19*comorbid_death[i]*H_10to19[i,t-1]/Tdeath +
-        Rdeath_20to39*comorbid_death[i]*H_20to39[i,t-1]/Tdeath +
-        Rdeath_40to49*comorbid_death[i]*H_40to49[i,t-1]/Tdeath +
-        Rdeath_50to59*comorbid_death[i]*H_50to59[i,t-1]/Tdeath +
-        Rdeath_60to69*comorbid_death[i]*H_60to69[i,t-1]/Tdeath +
-        Rdeath_70to79*comorbid_death[i]*H_70to79[i,t-1]/Tdeath +
-        Rdeath_80plus*comorbid_death[i]*H_80plus[i,t-1]/Tdeath
+      dG_10to19dt[i,t]<-Rdeath_10to19*comorbid_death[i]*crit_10to19[i,t-1]/Tcrit-
+        G_10to19[i,t-1]/Tdeath
+      dG_20to39dt[i,t]<-Rdeath_20to39*comorbid_death[i]*crit_20to39[i,t-1]/Tcrit-
+        G_20to39[i,t-1]/Tdeath
+      dG_40to49dt[i,t]<-Rdeath_40to49*comorbid_death[i]*crit_40to49[i,t-1]/Tcrit-
+        G_40to49[i,t-1]/Tdeath
+      dG_50to59dt[i,t]<-Rdeath_50to59*comorbid_death[i]*crit_50to59[i,t-1]/Tcrit-
+        G_50to59[i,t-1]/Tdeath
+      dG_60to69dt[i,t]<-Rdeath_60to69*comorbid_death_over60[i]*crit_60to69[i,t-1]/Tcrit-
+        G_60to69[i,t-1]/Tdeath
+      dG_70to79dt[i,t]<-Rdeath_70to79*comorbid_death_over60[i]*crit_70to79[i,t-1]/Tcrit-
+        G_70to79[i,t-1]/Tdeath
+      dG_80plusdt[i,t]<-Rdeath_80plus*comorbid_death_over60[i]*crit_80plus[i,t-1]/Tcrit-
+        G_80plus[i,t-1]/Tdeath
+      
+      dQ_10to19dt[i,t]<-(1-Rdeath_10to19*comorbid_death[i])*crit_10to19[i,t-1]/Tcrit-
+        Q_10to19[i,t-1]/Trecovcrit
+      dQ_20to39dt[i,t]<-(1-Rdeath_20to39*comorbid_death[i])*crit_20to39[i,t-1]/Tcrit-
+        Q_20to39[i,t-1]/Trecovcrit
+      dQ_40to49dt[i,t]<-(1-Rdeath_40to49*comorbid_death[i])*crit_40to49[i,t-1]/Tcrit-
+        Q_40to49[i,t-1]/Trecovcrit
+      dQ_50to59dt[i,t]<-(1-Rdeath_50to59*comorbid_death[i])*crit_50to59[i,t-1]/Tcrit-
+        Q_50to59[i,t-1]/Trecovcrit
+      dQ_60to69dt[i,t]<-(1-Rdeath_60to69*comorbid_death_over60[i])*crit_60to69[i,t-1]/Tcrit-
+        Q_60to69[i,t-1]/Trecovcrit
+      dQ_70to79dt[i,t]<-(1-Rdeath_70to79*comorbid_death_over60[i])*crit_70to79[i,t-1]/Tcrit-
+        Q_70to79[i,t-1]/Trecovcrit
+      dQ_80plusdt[i,t]<-(1-Rdeath_80plus*comorbid_death_over60[i])*crit_80plus[i,t-1]/Tcrit-
+        Q_80plus[i,t-1]/Trecovcrit
+      
+      
+      dDdt[i,t]<-G_10to19[i,t-1]/Tdeath +
+        G_20to39[i,t-1]/Tdeath +
+        G_40to49[i,t-1]/Tdeath +
+        G_50to59[i,t-1]/Tdeath +
+        G_60to69[i,t-1]/Tdeath +
+        G_70to79[i,t-1]/Tdeath +
+        G_80plus[i,t-1]/Tdeath
       
       
       #S[i,t]<-S[i,t-1]+dSdt[i,t]
@@ -640,6 +711,22 @@ for (t in 2:maxt) {
       R[i,t]<-R[i,t-1]+dRdt[i,t]
       
       #H[i,t]<-H[i,t-1]+dHdt[i,t]
+      G_10to19[i,t]<-G_10to19[i,t-1]+dG_10to19dt[i,t]
+      G_20to39[i,t]<-G_20to39[i,t-1]+dG_20to39dt[i,t]
+      G_40to49[i,t]<-G_40to49[i,t-1]+dG_40to49dt[i,t]
+      G_50to59[i,t]<-G_50to59[i,t-1]+dG_50to59dt[i,t]
+      G_60to69[i,t]<-G_60to69[i,t-1]+dG_60to69dt[i,t]
+      G_70to79[i,t]<-G_70to79[i,t-1]+dG_70to79dt[i,t]
+      G_80plus[i,t]<-G_80plus[i,t-1]+dG_80plusdt[i,t]
+      
+      Q_10to19[i,t]<-Q_10to19[i,t-1]+dQ_10to19dt[i,t]
+      Q_20to39[i,t]<-Q_20to39[i,t-1]+dQ_20to39dt[i,t]
+      Q_40to49[i,t]<-Q_40to49[i,t-1]+dQ_40to49dt[i,t]
+      Q_50to59[i,t]<-Q_50to59[i,t-1]+dQ_50to59dt[i,t]
+      Q_60to69[i,t]<-Q_60to69[i,t-1]+dQ_60to69dt[i,t]
+      Q_70to79[i,t]<-Q_70to79[i,t-1]+dQ_70to79dt[i,t]
+      Q_80plus[i,t]<-Q_80plus[i,t-1]+dQ_80plusdt[i,t]
+      
       H_10to19[i,t]<-H_10to19[i,t-1]+dH_10to19dt[i,t]
       H_20to39[i,t]<-H_20to39[i,t-1]+dH_20to39dt[i,t]
       H_40to49[i,t]<-H_40to49[i,t-1]+dH_40to49dt[i,t]
@@ -677,33 +764,47 @@ for (t in 2:maxt) {
       Icum_70to79[i,t]<-Icum_70to79[i,t-1]+E_70to79[i,t-1]/Tinc
       Icum_80plus[i,t]<-Icum_80plus[i,t-1]+E_80plus[i,t-1]/Tinc
       
-      Hcum_10to19[i,t]<-Hcum_10to19[i,t-1]+Rhosp_10to19*I_10to19[i,t-1]/Thosp
-      Hcum_20to39[i,t]<-Hcum_20to39[i,t-1]+Rhosp_20to39*I_20to39[i,t-1]/Thosp
-      Hcum_40to49[i,t]<-Hcum_40to49[i,t-1]+Rhosp_40to49*I_40to49[i,t-1]/Thosp
-      Hcum_50to59[i,t]<-Hcum_50to59[i,t-1]+Rhosp_50to59*I_50to59[i,t-1]/Thosp
-      Hcum_60to69[i,t]<-Hcum_60to69[i,t-1]+Rhosp_60to69*I_60to69[i,t-1]/Thosp
-      Hcum_70to79[i,t]<-Hcum_70to79[i,t-1]+Rhosp_70to79*I_70to79[i,t-1]/Thosp
-      Hcum_80plus[i,t]<-Hcum_80plus[i,t-1]+Rhosp_80plus*I_80plus[i,t-1]/Thosp
+      Hcum_10to19[i,t]<-Hcum_10to19[i,t-1]+(Rhosp_10to19)*comorbid_hosp[i]*I_10to19[i,t-1]/Tinf
+      Hcum_20to39[i,t]<-Hcum_20to39[i,t-1]+(Rhosp_20to39)*comorbid_hosp[i]*I_20to39[i,t-1]/Tinf
+      Hcum_40to49[i,t]<-Hcum_40to49[i,t-1]+(Rhosp_40to49)*comorbid_hosp[i]*I_40to49[i,t-1]/Tinf
+      Hcum_50to59[i,t]<-Hcum_50to59[i,t-1]+(Rhosp_50to59)*comorbid_hosp[i]*I_50to59[i,t-1]/Tinf
+      Hcum_60to69[i,t]<-Hcum_60to69[i,t-1]+(Rhosp_60to69)*comorbid_hosp[i]*I_60to69[i,t-1]/Tinf
+      Hcum_70to79[i,t]<-Hcum_70to79[i,t-1]+(Rhosp_70to79)*comorbid_hosp[i]*I_70to79[i,t-1]/Tinf
+      Hcum_80plus[i,t]<-Hcum_80plus[i,t-1]+(Rhosp_80plus)*comorbid_hosp[i]*I_80plus[i,t-1]/Tinf
+      
+      critcum_10to19[i,t]<-critcum_10to19[i,t-1]+Rcrit*comorbid_hosp[i]*I_10to19[i,t-1]/Tinf
+      critcum_20to39[i,t]<-critcum_20to39[i,t-1]+Rcrit*comorbid_hosp[i]*I_20to39[i,t-1]/Tinf
+      critcum_40to49[i,t]<-critcum_40to49[i,t-1]+Rcrit*comorbid_hosp[i]*I_40to49[i,t-1]/Tinf
+      critcum_50to59[i,t]<-critcum_50to59[i,t-1]+Rcrit*comorbid_hosp[i]*I_50to59[i,t-1]/Tinf
+      critcum_60to69[i,t]<-critcum_60to69[i,t-1]+Rcrit*comorbid_hosp[i]*I_60to69[i,t-1]/Tinf
+      critcum_70to79[i,t]<-critcum_70to79[i,t-1]+Rcrit*comorbid_hosp[i]*I_70to79[i,t-1]/Tinf
+      critcum_80plus[i,t]<-critcum_80plus[i,t-1]+Rcrit*comorbid_hosp[i]*I_80plus[i,t-1]/Tinf
   }
 }  
 
 
 if (model_by_age==1) {
   In=I_10to19+I_20to39+I_40to49+I_50to59+I_60to69+I_70to79+I_80plus
-  H=H_10to19+H_20to39+H_40to49+H_50to59+H_60to69+H_70to79+H_80plus
   E=E_10to19+E_20to39+E_40to49+E_50to59+E_60to69+E_70to79+E_80plus
   S=S_10to19+S_20to39+S_40to49+S_50to59+S_60to69+S_70to79+S_80plus
-  crit=crit_10to19+crit_20to39+crit_40to49+crit_50to59+crit_60to69+crit_70to79+crit_80plus
+  crit=crit_10to19+crit_20to39+crit_40to49+crit_50to59+crit_60to69+crit_70to79+crit_80plus+
+    Q_10to19+Q_20to39+Q_40to49+Q_50to59+Q_60to69+Q_70to79+Q_80plus+
+    G_10to19+G_20to39+G_40to49+G_50to59+G_60to69+G_70to79+G_80plus
+  H=H_10to19+H_20to39+H_40to49+H_50to59+H_60to69+H_70to79+H_80plus+crit
   Icum=Icum_10to19+Icum_20to39+Icum_40to49+Icum_50to59+Icum_60to69+Icum_70to79+Icum_80plus
   Hcum=Hcum_10to19+Hcum_20to39+Hcum_40to49+Hcum_50to59+Hcum_60to69+Hcum_70to79+Hcum_80plus
   Ecum=Ecum_10to19+Ecum_20to39+Ecum_40to49+Ecum_50to59+Ecum_60to69+Ecum_70to79+Ecum_80plus
   critcum=critcum_10to19+critcum_20to39+critcum_40to49+critcum_50to59+critcum_60to69+
     critcum_70to79+critcum_80plus
+} else if (model_by_age==0) {
+  crit<-crit+G+Q
+  H<-H+crit
 }
 
 #------------------- this stuff is for plotting indiana counties, you'll probably
 # want to comment it out -------------------------#
-df.Marion<-data.frame("I"=In[49,],"H"=H[49,],"crit"=crit[49,],"D"=D[49,],"t"=(1:maxt))
+df.Marion<-data.frame("I"=In[49,],"H"=H[49,],"crit"=crit[49,],"D"=D[49,],"t"=(1:maxt))#"G"=G[49,],
+                     # "Q"=Q[49,],"S"=S[49,],"E"=E[49,])
 df.Monroe<-data.frame("I"=In[53,],"H"=H[53,],"crit"=crit[53,],"D"=D[53,],"t"=(1:maxt))
 df.Lake<-data.frame("I"=In[45,],"H"=H[45,],"crit"=crit[45,],"D"=D[45,],"t"=(1:maxt))
 
@@ -712,6 +813,8 @@ print(ggplot(df.Marion,aes(x=t))+
         geom_line(aes(y=H/0.95,color="hospitalized"))+
         geom_line(aes(y=crit,color="critical"))+
         geom_line(aes(y=D,color="deceased"))+
+        #geom_line(aes(y=Q,color="Q"))+
+        #geom_line(aes(y=G,color="G"))+
         ggtitle(tit1)+
         scale_x_continuous(breaks=seq(0,300,30),name="days")+
       #  scale_y_continuous(breaks=seq(0,190000,2000),name="number")+
@@ -793,17 +896,17 @@ if (output==1) {
   cat("\n")
   cat(paste("Pinf=",Pinf))
   cat("\n")
-  cat(paste("Rdeath=",Rdeath*Rhosp))
+  cat(paste("Rdeath=",Rdeath*Rcrit))
   cat("\n")
   cat(paste("Rhosp=",Rhosp))
   cat("\n")
   cat(paste("Trecov=",Trecov))
   cat("\n")
-  cat(paste("Thosp=",Thosp))
+  #cat(paste("Thosp=",Thosp))
   cat("\n")
   cat(paste("Tdeath=",Tdeath))
   cat("\n")
-  cat(paste("crit_rate=",crit_rate))
+  cat(paste("Rcrit=",Rcrit))
   cat("\n")
   cat(paste("Tinc=",Tinc))
   cat("\n")
@@ -870,3 +973,7 @@ if (output==1) {
   
 }
 
+# } # comment these out for not doing a mass scenario run
+# }
+# }
+# }
