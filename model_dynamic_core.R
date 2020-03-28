@@ -20,9 +20,9 @@ for (a in 1:nage) {
 for (t in 2:maxt) {
   
   # change Rt based time
-  if (t<intervention_time & t>lift_time) {
+  if (t<intervention_time | t>=lift_time) {
     Rt<-R0
-  } else {
+  } else if (t>=intervention_time & t<lift_time){
     Rt<-(1-intervention_R_rdxn)*R0
   }
   

@@ -20,6 +20,43 @@ library(ggplot2)
 library(haven)
 library(readxl)
 
+# for (R0 in c(2.8,3.0)) {#c(2.0,2.2,2.4,2.6,2.8,3.0)) {
+# for (intervention_R_rdxn in c(0.0,0.25,0.5)) {
+# for (nage in c(1,7)) {
+# for (model_comorbidities in c(0,1)) {
+
+R0<-2.8
+intervention_R_rdxn<-0.50
+nage<-7
+model_comorbidities<-0
+
+
+Rdeath<-c(seq(0,nage))
+Rhosp<-c(seq(0,nage))
+if (nage==1 & model_comorbidities==1) {
+  tag<-'ComorbidOnly'
+  Rdeath[1]<-0.02
+  Rhosp[1]<-0.15
+} else if (nage==7 & model_comorbidities==0) {
+  tag<-'AgeOnly'
+  Rdeath[1]<-0.002
+  Rhosp[1]<-0.001
+} else if (nage==7 & model_comorbidities==1) {
+  tag<-'Both'
+  Rdeath[1]<-0.002
+  Rhosp[1]<-0.001
+} else if (nage==1 & model_comorbidities==0) {
+  tag<-'Neither'
+  Rdeath[1]<-0.02
+  Rhosp[1]<-0.15
+}
+
+output_base<-paste("Scenario_R",format(R0,nsmall=1),"_",100*intervention_R_rdxn,"rdxn_",tag,sep="")
+
+model_outfile<-paste(output_base,".csv",sep="")
+param_outfile<-paste(output_base,"_param.txt",sep="")
+print(output_base)
+
 # run code to configure model
 source("model_configuration.R")
 
@@ -31,3 +68,8 @@ source("model_dynamic_core.R")
 
 # output results
 source("model_out.R")
+
+# }
+# }
+# }
+# }

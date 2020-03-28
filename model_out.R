@@ -47,18 +47,45 @@ for (i in 1:ncounties) {
 df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[49,],"E"=Eout[49,],
                       "I"=Iout[49,],"R"=Rout[49,],
                       "D"=Dout[49,],"H"=Hout[49,],"C"=Cout[49,])
+# df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
+#                       "I"=Iout[1,],"R"=Rout[1,],
+#                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
 df.Marion<-df.Marion%>% mutate(N=S+E+I+R+C+H+D)
 print(ggplot(df.Marion,aes(x=t))+
         scale_x_continuous(breaks=seq(0,300,30),name="days")+
-        geom_line(aes(y=S,color="susceptible"))+
-        geom_line(aes(y=E,color="exposed"))+
+      #  geom_line(aes(y=S,color="susceptible"))+
+       # geom_line(aes(y=E,color="exposed"))+
         geom_line(aes(y=I,color="infectious"))+
-        geom_line(aes(y=R,color="removed"))+
+       # geom_line(aes(y=R,color="removed"))+
         geom_line(aes(y=D,color="deceased"))+
-        geom_line(aes(y=N,color="total"))+
+       # geom_line(aes(y=N,color="total"))+
         geom_line(aes(y=H,color="hospitalized"))+
-        geom_line(aes(y=C,color="critical"))
+        geom_line(aes(y=C,color="critical"))+
+        ggtitle(paste(output_base,"Marion"))
 )
+ggsave(paste(outdir,output_base,'_Marion.png',sep=""))
+
+df.Indiana<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[93,],"E"=Eout[93,],
+                      "I"=Iout[93,],"R"=Rout[93,],
+                      "D"=Dout[93,],"H"=Hout[93,],"C"=Cout[93,])
+# df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
+#                       "I"=Iout[1,],"R"=Rout[1,],
+#                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
+df.Indiana<-df.Indiana%>% mutate(N=S+E+I+R+C+H+D)
+print(ggplot(df.Indiana,aes(x=t))+
+        scale_x_continuous(breaks=seq(0,300,30),name="days")+
+        #  geom_line(aes(y=S,color="susceptible"))+
+        # geom_line(aes(y=E,color="exposed"))+
+        geom_line(aes(y=I,color="infectious"))+
+        # geom_line(aes(y=R,color="removed"))+
+        geom_line(aes(y=D,color="deceased"))+
+        # geom_line(aes(y=N,color="total"))+
+        geom_line(aes(y=H,color="hospitalized"))+
+        geom_line(aes(y=C,color="critical"))+
+        ggtitle(paste(output_base,"Indiana"))
+)
+ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
+
 
 #######################################################
 # output files
@@ -80,24 +107,24 @@ if (output==1) {
                   "Deceased"=round(Dout[1,]),
                   "PercentInfected"=round(percent_infected[1,]))
   
-  for (i in 2:ncounties) {
-    
-    countycol<-rep(county_names[i],maxt)
-    df2<-data.frame("County"=countycol,"Day"=daycol,
-                    "Susceptible"=round(Sout[i,]),
-                    "Exposed"=round(Eout[i,]),
-                    "ExposedCumulative"=round(Ecumout[i,]),
-                    "InfectedNotHospitalized"=round(Iout[i,]),
-                    "InfectedCumulative"=round(Icumout[i,]),
-                    "Hospitalized"=round(Hout[i,]),
-                    "HospitalizedCumulative"=round(Hcumout[i,]),
-                    "Critical"=round(Cout[i,]),
-                    "CriticalCumulative"=round(Ccumout[i,]),
-                    "Deceased"=round(Dout[i,]),
-                    "PercentInfected"=round(percent_infected[i,]))
-    df1<-df1%>%bind_rows(df2)
-    
-  }
+  # for (i in 2:ncounties) {
+  #   
+  #   countycol<-rep(county_names[i],maxt)
+  #   df2<-data.frame("County"=countycol,"Day"=daycol,
+  #                   "Susceptible"=round(Sout[i,]),
+  #                   "Exposed"=round(Eout[i,]),
+  #                   "ExposedCumulative"=round(Ecumout[i,]),
+  #                   "InfectedNotHospitalized"=round(Iout[i,]),
+  #                   "InfectedCumulative"=round(Icumout[i,]),
+  #                   "Hospitalized"=round(Hout[i,]),
+  #                   "HospitalizedCumulative"=round(Hcumout[i,]),
+  #                   "Critical"=round(Cout[i,]),
+  #                   "CriticalCumulative"=round(Ccumout[i,]),
+  #                   "Deceased"=round(Dout[i,]),
+  #                   "PercentInfected"=round(percent_infected[i,]))
+  #   df1<-df1%>%bind_rows(df2)
+  #   
+  # }
   
   write_csv(df1,paste(outdir,model_outfile,sep=""))
   
