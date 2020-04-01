@@ -21,12 +21,12 @@ library(haven)
 library(readxl)
 
 for (R0 in c(2.4,2.6,2.8,3.0)) {
-for (intervention_R_rdxn in c(0.0,0.25,0.5)) {
-for (nage in c(1)) {
+#for (intervention_R_rdxn in c(0.0,0.25,0.5)) {
+for (nage in c(1,8)) {
 for (model_comorbidities in c(0,1)) {
 
 # R0<-2.8
-# intervention_R_rdxn<-0.0
+intervention_R_rdxn<-0.75
 # nage<-1
 # model_comorbidities<-0
 
@@ -72,4 +72,4 @@ source("model_out.R")
 }
 }
 }
-}
+#}
