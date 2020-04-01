@@ -84,7 +84,7 @@ print(ggplot(df.Indiana,aes(x=t))+
         geom_line(aes(y=C,color="critical"))+
         ggtitle(paste(output_base,"Indiana"))
 )
-ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
+# ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
 
 
 #######################################################
@@ -95,36 +95,36 @@ if (output==1) {
   daycol<-seq(1,maxt)
   
   df1<-data.frame("County"=countycol,"Day"=daycol,
-                  "Susceptible"=round(Sout[1,]),
-                  "Exposed"=round(Eout[1,]),
-                  "ExposedCumulative"=round(Ecumout[1,]),
-                  "InfectedNotHospitalized"=round(Iout[1,]),
-                  "InfectedCumulative"=round(Icumout[1,]),
-                  "Hospitalized"=round(Hout[1,]),
-                  "HospitalizedCumulative"=round(Hout[1,]),
-                  "Critical"=round(Cout[1,]),
-                  "CriticalCumulative"=round(Ccumout[1,]),
-                  "Deceased"=round(Dout[1,]),
+                  "Susceptible"=format(round(Sout[1,]),digits=7),
+                  "Exposed"=format(round(Eout[1,]),digits=7),
+                  "ExposedCumulative"=format(round(Ecumout[1,]),digits=7),
+                  "InfectedNotHospitalized"=format(round(Iout[1,]),digits=7),
+                  "InfectedCumulative"=format(round(Icumout[1,]),digits=7),
+                  "Hospitalized"=format(round(Hout[1,]),digits=7),
+                  "HospitalizedCumulative"=format(round(Hout[1,]),digits=7),
+                  "Critical"=format(round(Cout[1,]),digits=7),
+                  "CriticalCumulative"=format(round(Ccumout[1,]),digits=7),
+                  "Deceased"=format(round(Dout[1,]),digits=7),
                   "PercentInfected"=round(percent_infected[1,]))
   
-  # for (i in 2:ncounties) {
-  #   
-  #   countycol<-rep(county_names[i],maxt)
-  #   df2<-data.frame("County"=countycol,"Day"=daycol,
-  #                   "Susceptible"=round(Sout[i,]),
-  #                   "Exposed"=round(Eout[i,]),
-  #                   "ExposedCumulative"=round(Ecumout[i,]),
-  #                   "InfectedNotHospitalized"=round(Iout[i,]),
-  #                   "InfectedCumulative"=round(Icumout[i,]),
-  #                   "Hospitalized"=round(Hout[i,]),
-  #                   "HospitalizedCumulative"=round(Hcumout[i,]),
-  #                   "Critical"=round(Cout[i,]),
-  #                   "CriticalCumulative"=round(Ccumout[i,]),
-  #                   "Deceased"=round(Dout[i,]),
-  #                   "PercentInfected"=round(percent_infected[i,]))
-  #   df1<-df1%>%bind_rows(df2)
-  #   
-  # }
+  for (i in 2:ncounties) {
+
+    countycol<-rep(county_names[i],maxt)
+    df2<-data.frame("County"=countycol,"Day"=daycol,
+                    "Susceptible"=format(round(Sout[i,]),digits=7),
+                    "Exposed"=format(round(Eout[i,]),digits=7),
+                    "ExposedCumulative"=format(round(Ecumout[i,]),digits=7),
+                    "InfectedNotHospitalized"=format(round(Iout[i,]),digits=7),
+                    "InfectedCumulative"=format(round(Icumout[i,]),digits=7),
+                    "Hospitalized"=format(round(Hout[i,]),digits=7),
+                    "HospitalizedCumulative"=format(round(Hcumout[i,]),digits=7),
+                    "Critical"=format(round(Cout[i,]),digits=7),
+                    "CriticalCumulative"=format(round(Ccumout[i,]),digits=7),
+                    "Deceased"=format(round(Dout[i,]),digits=7),
+                    "PercentInfected"=round(percent_infected[i,]))
+    df1<-df1%>%bind_rows(df2)
+
+  }
   
   write_csv(df1,paste(outdir,model_outfile,sep=""))
   

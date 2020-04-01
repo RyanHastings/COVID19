@@ -99,6 +99,51 @@ if (nage==1) {
 
     S[i,1,7]<-as.numeric(IN.pop.raw$est72018sex0_age80to84[i])+
       as.numeric(IN.pop.raw$est72018sex0_age85plus[i])
+    
+  }
+  S[ncounties,1,1]=sum(S[1:ncounties-1,1,1])
+  S[ncounties,1,2]=sum(S[1:ncounties-1,1,2])
+  S[ncounties,1,3]=sum(S[1:ncounties-1,1,3])
+  S[ncounties,1,4]=sum(S[1:ncounties-1,1,4])
+  S[ncounties,1,5]=sum(S[1:ncounties-1,1,5])
+  S[ncounties,1,6]=sum(S[1:ncounties-1,1,6])
+  S[ncounties,1,7]=sum(S[1:ncounties-1,1,7])
+  S[ncounties,1,8]=sum(S[1:ncounties-1,1,8])
+} else if (nage==8) {
+  for (i in 1:ncounties-1) {
+      
+    S[i,1,1]<-as.numeric(IN.pop.raw$est72018sex0_age0to4[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age5to9[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age10to14[i])+
+      as.numeric(IN.pop.raw$est72010sex0_age15to19[i])
+      
+      
+      
+    S[i,1,2]<-as.numeric(IN.pop.raw$est72018sex0_age20to24[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age25to29[i])
+      
+    S[i,1,3]<-as.numeric(IN.pop.raw$est72018sex0_age30to34[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age35to39[i])
+      
+      
+    S[i,1,4]<-as.numeric(IN.pop.raw$est72018sex0_age40to44[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age45to49[i])
+      
+      
+    S[i,1,5]<-as.numeric(IN.pop.raw$est72018sex0_age50to54[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age55to59[i])
+      
+      
+    S[i,1,6]<-as.numeric(IN.pop.raw$est72018sex0_age60to64[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age65to69[i])
+      
+      
+    S[i,1,7]<-as.numeric(IN.pop.raw$est72018sex0_age70to74[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age75to79[i])
+      
+      
+    S[i,1,8]<-as.numeric(IN.pop.raw$est72018sex0_age80to84[i])+
+      as.numeric(IN.pop.raw$est72018sex0_age85plus[i])
   }
   
   S[ncounties,1,1]=sum(S[1:ncounties-1,1,1])
@@ -108,6 +153,7 @@ if (nage==1) {
   S[ncounties,1,5]=sum(S[1:ncounties-1,1,5])
   S[ncounties,1,6]=sum(S[1:ncounties-1,1,6])
   S[ncounties,1,7]=sum(S[1:ncounties-1,1,7])
+  S[ncounties,1,8]=sum(S[1:ncounties-1,1,8])
 }
 
 

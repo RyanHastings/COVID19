@@ -9,7 +9,7 @@ outdir<-datadir
 
 # NPI timing
 intervention_time<-50 # days after day 0
-lift_time<-300 # days after day 0 that NPI is ceased
+lift_time<-500 # days after day 0 that NPI is ceased
 
 ########## epidemiological variables
 #R0<-2.2 # base reproduction rate
@@ -21,25 +21,27 @@ Tdeath<-18 # time in hospital until death
 Pinf<-1.0 # max proportion of population to get infected
 
 #nage=7 # number of age groups
-age60<-5 # index of age group that is sixty
+age60<-6#5 # index of age group that is sixty
 #Rdeath<-c(seq(0,nage)) # set up Rdeath array
 # Rdeath[1]<-0.02
 #Rdeath[1]<-0.002 # Death rate per infected for age groups...10-19 OR if nage==1 (no age groups) this is Rdeath
-Rdeath[2]<-0.002  # 20 to 39
-Rdeath[3]<-0.004  # 40 to 49
-Rdeath[4]<-0.013  # 50 to 59
-Rdeath[5]<-0.036  # 60 to 69
-Rdeath[6]<-0.080  # 70 to 79
-Rdeath[7]<-0.148  # 80 plus
+Rdeath[2]<-0.00031#0.002  # 20 to 39
+Rdeath[3]<-0.00084#0.004  # 40 to 49
+Rdeath[4]<-0.00160#0.013  # 50 to 59
+Rdeath[5]<-0.0060#0.036  # 60 to 69
+Rdeath[6]<-0.0190#0.080  # 70 to 79
+Rdeath[7]<-0.0430#0.148  # 80 plus
+Rdeath[8]<-0.0780
 #Rhosp<-c(seq(0,nage))
 # Rhosp[1]<-0.15
 # Rhosp[1]<-0.001 # Hospitalization rate per infected for age groups
 Rhosp[2]<-0.100
 Rhosp[3]<-0.100
 Rhosp[4]<-0.100
-Rhosp[5]<-0.223
+Rhosp[5]<-0.100#0.223
 Rhosp[6]<-0.223
 Rhosp[7]<-0.223
+Rhosp[8]<-0.223
 
 #model_comorbidities<-1 # Include comorbidities, or no, 0=no, 1=yes
 Rhosp_diabetes<-0.073 # Rate of hospitalization
@@ -55,8 +57,11 @@ Rdeath_copd<-0.063
 
 if (nage==7 ) {
 Rdeath<-Rdeath/2.63 # because the death rate is WAY TOO HIGH if I don't do this
+} else if (nage==8) {
+#  Rdeath<-Rdeath/2.8
+  Rhosp<-Rhosp/5
 }
-Rcrit=0.05 # proportion to be critically hospitalized
+Rcrit=0.05/5 # proportion to be critically hospitalized
 
 maxt=301 # max time
 ncounties=92 # number of counties
