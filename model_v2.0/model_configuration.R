@@ -11,6 +11,16 @@ outdir<-datadir
 intervention_time<-50 # days after day 0
 lift_time<-500 # days after day 0 that NPI is ceased
 
+# first case initialization method
+initialization_method<-2 # 0 seed each county with one case at day zero
+                         # 1 seed each county at a different date
+                         # 2 seed each county at a different date, reading in from file;
+                         #   if no cases in county, set day zero to a month ago
+initialization_file<-"CountyFirstCase.csv" # for method 2
+day_zero_date<-0
+
+
+
 ########## epidemiological variables
 #R0<-2.2 # base reproduction rate
 #intervention_R_rdxn<-0.25 # amount by which R0 is reduced by NPI
@@ -60,12 +70,13 @@ Rdeath<-Rdeath/2.63 # because the death rate is WAY TOO HIGH if I don't do this
 } else if (nage==8) {
 #  Rdeath<-Rdeath/2.8
   Rhosp<-Rhosp/5
+  Rdeath<-Rdeath*0.36667
 }
 Rcrit=0.05/5 # proportion to be critically hospitalized
 
 maxt=301 # max time
 ncounties=92 # number of counties
-
+state_name<-"Indiana"
 
 output<-1 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
 # the values as columns and a file containing all of the parameter settings

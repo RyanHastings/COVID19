@@ -19,6 +19,8 @@ for (a in 1:nage) {
 # the dynamic core
 for (t in 2:maxt) {
   
+  In[,t-1,1]<-In[,t-1,1]+seed_I[,t-1,1]
+  
   # change Rt based time
   if (t<intervention_time | t>=lift_time) {
     Rt<-R0
@@ -27,7 +29,7 @@ for (t in 2:maxt) {
   }
   
   dSdt[i,t,a]<-0
-  for (i in 1:ncounties) {
+  for (i in 1:ncounties-1) {
     
     dum1<-0
     dum2<-0
@@ -86,11 +88,28 @@ for (t in 2:maxt) {
       R[i,t,a]<-R[i,t-1,a]+dRdt[i,t,a]
       D[i,t,a]<-D[i,t-1,a]+dDdt[i,t,a]
     
-      Ecum[i,t,a]=Ecum[i,t-1,a]+term1
+      Ecum[i,t,a]=Ecum[i,t-1,a]+term1/nage
       Icum[i,t,a]=Icum[i,t-1,a]+term2
       Hcum[i,t,a]=Hcum[i,t-1,a]+Rhosp[a]*term3
       Ccum[i,t,a]=Ccum[i,t-1,a]+Rcrit*term3
     }
+    
+  }
+  
+  for (a in 1:nage) {
+    S[ncounties,t,a]<-sum(S[1:ncounties-1,t,a])
+    E[ncounties,t,a]<-sum(E[1:ncounties-1,t,a])
+    In[ncounties,t,a]<-sum(In[1:ncounties-1,t,a])
+    H[ncounties,t,a]<-sum(H[1:ncounties-1,t,a])
+    Q[ncounties,t,a]<-sum(Q[1:ncounties-1,t,a])
+    G[ncounties,t,a]<-sum(G[1:ncounties-1,t,a])
+    C[ncounties,t,a]<-sum(C[1:ncounties-1,t,a])
+    R[ncounties,t,a]<-sum(R[1:ncounties-1,t,a])
+    D[ncounties,t,a]<-sum(D[1:ncounties-1,t,a])
+    Ecum[ncounties,t,a]<-sum(Ecum[1:ncounties-1,t,a])
+    Icum[ncounties,t,a]<-sum(Icum[1:ncounties-1,t,a])
+    Hcum[ncounties,t,a]<-sum(Hcum[1:ncounties-1,t,a])
+    Ccum[ncounties,t,a]<-sum(Ccum[1:ncounties-1,t,a])
   }
 }
 

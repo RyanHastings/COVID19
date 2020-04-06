@@ -8,19 +8,41 @@
 ncounties<-ncounties+1
 #############################################################
 # Initial number of cases per county
-In<-array(0,dim=c(ncounties,maxt,nage))
-for (i in 1:ncounties) {
-  In[i,1,1]=1
-  In[i,2:maxt,]=0
+seed_I<-array(0,dim=c(ncounties,maxt,nage))
+if (initialization_method==0) {
+  for (i in 1:ncounties) {
+    seed_I[i,1,1]=1
+  }
+} else if (initialization_method==2) {
+  init_filename<-paste(datadir,initialization_file,sep="")
+  init_data<-read_csv(init_filename,col_types=cols(
+    FIPS=col_integer(),
+    County=col_character(),
+    DateFirstConfirmed=col_date(format="%m/%d/%Y"),
+    DateFirstDeath=col_date(format="%m/%d/%Y"),
+    X5=col_character()
+  ))
+  null_start_date<-Sys.Date()
+  init_data$DateFirstConfirmed[is.na(init_data$DateFirstConfirmed)]<-null_start_date
+  init_data<-init_data%>%mutate(DayZero=DateFirstConfirmed-30)
+  day_zero_date=min(init_data$DayZero)
+  init_data<-init_data%>%mutate(DayFromDayZero=DayZero-day_zero_date)
+  for (i in 1:ncounties-1) {
+    t<-init_data$DayFromDayZero[i]+1
+    seed_I[i,t,1]<-1
+  }
 }
-
+In<-seed_I
+  
 #############################################################
 # get county populations
 #
 # This will need to be modified for your state
 US.pop.raw<-read_csv('PEP_2018_PEPAGESEX/PEP_2018_PEPAGESEX_with_ann.csv')
-IN.pop.raw<-US.pop.raw%>%filter(grepl(", Indiana",`GEO.display-label`))
+state_name<-paste(",",state_name)
+IN.pop.raw<-US.pop.raw%>%filter(grepl(state_name,`GEO.display-label`))
 county_names<-IN.pop.raw$`GEO.display-label`
+county_names<-append(county_names,state_name)
 
 S<-array(0,dim=c(ncounties,maxt,nage))
 
@@ -193,6 +215,7 @@ Ccum<-array(0,dim=c(ncounties,maxt,nage))
 Qcum<-array(0,dim=c(ncounties,maxt,nage))
 Gcum<-array(0,dim=c(ncounties,maxt,nage))
 
+dates<-c(seq.Date(day_zero_date,day_zero_date+maxt-1,"days"))
 
 #################################################
 # comorbidities
@@ -262,7 +285,12 @@ if (model_comorbidities==1) {
         row$age60up_copd_percent*Rdeath_copd
     }
   }
+  # if (nage==1) {
+  #   comorbid_death<-comorbid_death*3
+  #   comorbid_death_over60<-comorbid_death_over60*3
+  # }
 }
+
 
 
 

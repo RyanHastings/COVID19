@@ -42,50 +42,50 @@ for (i in 1:ncounties) {
     percent_infected[i,t]=round(100*Icumout[i,t]/Nout[i,1])
   }
 }
-
-# make a plot of Marion county
-df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[49,],"E"=Eout[49,],
-                      "I"=Iout[49,],"R"=Rout[49,],
-                      "D"=Dout[49,],"H"=Hout[49,],"C"=Cout[49,])
-# df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
-#                       "I"=Iout[1,],"R"=Rout[1,],
-#                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
-df.Marion<-df.Marion%>% mutate(N=S+E+I+R+C+H+D)
-print(ggplot(df.Marion,aes(x=t))+
-        scale_x_continuous(breaks=seq(0,300,30),name="days")+
-      #  geom_line(aes(y=S,color="susceptible"))+
-       # geom_line(aes(y=E,color="exposed"))+
-        geom_line(aes(y=I,color="infectious"))+
-       # geom_line(aes(y=R,color="removed"))+
-        geom_line(aes(y=D,color="deceased"))+
-       # geom_line(aes(y=N,color="total"))+
-        geom_line(aes(y=H,color="hospitalized"))+
-        geom_line(aes(y=C,color="critical"))+
-        ggtitle(paste(output_base,"Marion"))
-)
-ggsave(paste(outdir,output_base,'_Marion.png',sep=""))
-
-df.Indiana<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[93,],"E"=Eout[93,],
-                      "I"=Iout[93,],"R"=Rout[93,],
-                      "D"=Dout[93,],"H"=Hout[93,],"C"=Cout[93,])
-# df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
-#                       "I"=Iout[1,],"R"=Rout[1,],
-#                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
-df.Indiana<-df.Indiana%>% mutate(N=S+E+I+R+C+H+D)
-print(ggplot(df.Indiana,aes(x=t))+
-        scale_x_continuous(breaks=seq(0,300,30),name="days")+
-        #  geom_line(aes(y=S,color="susceptible"))+
-        # geom_line(aes(y=E,color="exposed"))+
-        geom_line(aes(y=I,color="infectious"))+
-        # geom_line(aes(y=R,color="removed"))+
-        geom_line(aes(y=D,color="deceased"))+
-        # geom_line(aes(y=N,color="total"))+
-        geom_line(aes(y=H,color="hospitalized"))+
-        geom_line(aes(y=C,color="critical"))+
-        ggtitle(paste(output_base,"Indiana"))
-)
-# ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
-
+# 
+# # make a plot of Marion county
+# df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[49,],"E"=Eout[49,],
+#                       "I"=Iout[49,],"R"=Rout[49,],
+#                       "D"=Dout[49,],"H"=Hout[49,],"C"=Cout[49,])
+# # df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
+# #                       "I"=Iout[1,],"R"=Rout[1,],
+# #                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
+# df.Marion<-df.Marion%>% mutate(N=S+E+I+R+C+H+D)
+# print(ggplot(df.Marion,aes(x=t))+
+#         scale_x_continuous(breaks=seq(0,300,30),name="days")+
+#       #  geom_line(aes(y=S,color="susceptible"))+
+#        # geom_line(aes(y=E,color="exposed"))+
+#         geom_line(aes(y=I,color="infectious"))+
+#        # geom_line(aes(y=R,color="removed"))+
+#         geom_line(aes(y=D,color="deceased"))+
+#        # geom_line(aes(y=N,color="total"))+
+#         geom_line(aes(y=H,color="hospitalized"))+
+#         geom_line(aes(y=C,color="critical"))+
+#         ggtitle(paste(output_base,"Marion"))
+# )
+# ggsave(paste(outdir,output_base,'_Marion.png',sep=""))
+# 
+# df.Indiana<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[93,],"E"=Eout[93,],
+#                       "I"=Iout[93,],"R"=Rout[93,],
+#                       "D"=Dout[93,],"H"=Hout[93,],"C"=Cout[93,])
+# # df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
+# #                       "I"=Iout[1,],"R"=Rout[1,],
+# #                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
+# df.Indiana<-df.Indiana%>% mutate(N=S+E+I+R+C+H+D)
+# print(ggplot(df.Indiana,aes(x=t))+
+#         scale_x_continuous(breaks=seq(0,300,30),name="days")+
+#         #  geom_line(aes(y=S,color="susceptible"))+
+#         # geom_line(aes(y=E,color="exposed"))+
+#         geom_line(aes(y=I,color="infectious"))+
+#         # geom_line(aes(y=R,color="removed"))+
+#         geom_line(aes(y=D,color="deceased"))+
+#         # geom_line(aes(y=N,color="total"))+
+#         geom_line(aes(y=H,color="hospitalized"))+
+#         geom_line(aes(y=C,color="critical"))+
+#         ggtitle(paste(output_base,"Indiana"))
+# )
+# # ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
+# 
 
 #######################################################
 # output files
@@ -94,7 +94,7 @@ if (output==1) {
   countycol<-rep(county_names[1],maxt)
   daycol<-seq(1,maxt)
   
-  df1<-data.frame("County"=countycol,"Day"=daycol,
+  df1<-data.frame("County"=countycol,"Day"=daycol,"Date"=dates,
                   "Susceptible"=format(round(Sout[1,]),digits=7),
                   "Exposed"=format(round(Eout[1,]),digits=7),
                   "ExposedCumulative"=format(round(Ecumout[1,]),digits=7),
@@ -110,7 +110,7 @@ if (output==1) {
   for (i in 2:ncounties) {
 
     countycol<-rep(county_names[i],maxt)
-    df2<-data.frame("County"=countycol,"Day"=daycol,
+    df2<-data.frame("County"=countycol,"Day"=daycol,"Date"=dates,
                     "Susceptible"=format(round(Sout[i,]),digits=7),
                     "Exposed"=format(round(Eout[i,]),digits=7),
                     "ExposedCumulative"=format(round(Ecumout[i,]),digits=7),
