@@ -17,7 +17,7 @@ for (t in 2:maxt) {
   term3<-In[t-1]/Tinf
   term4<-H[t-1]/Thosp
   term6<-G[t-1]/Tdeath
-  term7<-Q[t-1]/Thosp
+  term7<-Q[t-1]/Tcrit
       
   dSdt[t]<--term1
   dEdt[t]<-term1-term2

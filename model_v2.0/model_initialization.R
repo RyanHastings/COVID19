@@ -24,7 +24,7 @@ if (initialization_method==0) {
   ))
   null_start_date<-Sys.Date()
   init_data$DateFirstConfirmed[is.na(init_data$DateFirstConfirmed)]<-null_start_date
-  init_data<-init_data%>%mutate(DayZero=DateFirstConfirmed-30)
+  init_data<-init_data%>%mutate(DayZero=DateFirstConfirmed-DayZeroOffset)
   day_zero_date=min(init_data$DayZero)
   init_data<-init_data%>%mutate(DayFromDayZero=DayZero-day_zero_date)
   for (i in 1:ncounties-1) {
@@ -38,7 +38,7 @@ In<-seed_I
 # get county populations
 #
 # This will need to be modified for your state
-US.pop.raw<-read_csv('PEP_2018_PEPAGESEX/PEP_2018_PEPAGESEX_with_ann.csv')
+US.pop.raw<-read_csv('../PEP_2018_PEPAGESEX/PEP_2018_PEPAGESEX_with_ann.csv')
 state_name<-paste(",",state_name)
 IN.pop.raw<-US.pop.raw%>%filter(grepl(state_name,`GEO.display-label`))
 county_names<-IN.pop.raw$`GEO.display-label`

@@ -21,12 +21,12 @@ library(haven)
 library(readxl)
 
 # for (R0 in c(2.0,2.2,2.4,2.6,2.8,3.0)) {
-# for (intervention_R_rdxn in c(0.0,0.25,0.5,0.65,0.75)) {
+# for (intervention_R_rdxn in c(0.0,0.25,0.5,0.65,0.8)) {
 # for (nage in c(1,8)) {
 # for (model_comorbidities in c(0,1)) {
 
-R0<-3.0
-intervention_R_rdxn<-0.75
+R0<-2.8
+intervention_R_rdxn<-0.8
 nage<-8
 model_comorbidities<-0
 
@@ -36,7 +36,7 @@ Rhosp<-c(seq(0,nage))
 if (nage==1 & model_comorbidities==1) {
   tag<-'ComorbidOnly'
   Rdeath[1]<-0.0066
-  Rhosp[1]<-0.015
+  Rhosp[1]<-0.06
 } else if (nage==8 & model_comorbidities==0) {
   tag<-'AgeOnly'
   Rdeath[1]<-0.00007
@@ -48,7 +48,7 @@ if (nage==1 & model_comorbidities==1) {
 } else if (nage==1 & model_comorbidities==0) {
   tag<-'Neither'
   Rdeath[1]<-0.0066
-  Rhosp[1]<-0.015
+  Rhosp[1]<-0.06
 }
 
 output_base<-paste("Scenario_R",format(R0,nsmall=1),"_",100*intervention_R_rdxn,"rdxn_",tag,sep="")

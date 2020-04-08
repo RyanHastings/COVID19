@@ -4,11 +4,11 @@
 # Configuration variables for running the model
 ###################################################################
 #
-datadir<-("../../COVID19Response/")
-outdir<-datadir
+datadir<-("../../../COVID19Response/")
+outdir<- ("../../../COVID19Response/20200408/")
 
 # NPI timing
-intervention_time<-50 # days after day 0
+intervention_time<-65 # days after day 0
 lift_time<-500 # days after day 0 that NPI is ceased
 
 # first case initialization method
@@ -18,7 +18,7 @@ initialization_method<-2 # 0 seed each county with one case at day zero
                          #   if no cases in county, set day zero to a month ago
 initialization_file<-"CountyFirstCase.csv" # for method 2
 day_zero_date<-0
-
+DayZeroOffset<-45
 
 
 ########## epidemiological variables
@@ -69,10 +69,10 @@ if (nage==7 ) {
 Rdeath<-Rdeath/2.63 # because the death rate is WAY TOO HIGH if I don't do this
 } else if (nage==8) {
 #  Rdeath<-Rdeath/2.8
-  Rhosp<-Rhosp/5
+  Rhosp<-Rhosp*0.449
   Rdeath<-Rdeath*0.36667
 }
-Rcrit=0.05/5 # proportion to be critically hospitalized
+Rcrit=0.024#/5 # proportion to be critically hospitalized
 
 maxt=301 # max time
 ncounties=92 # number of counties
