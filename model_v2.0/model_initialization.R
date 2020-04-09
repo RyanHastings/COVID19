@@ -9,6 +9,7 @@ ncounties<-ncounties+1
 #############################################################
 # Initial number of cases per county
 seed_I<-array(0,dim=c(ncounties,maxt,nage))
+In<-seed_I
 if (initialization_method==0) {
   for (i in 1:ncounties) {
     seed_I[i,1,1]=1
@@ -31,8 +32,11 @@ if (initialization_method==0) {
     t<-init_data$DayFromDayZero[i]+1
     seed_I[i,t,1]<-1
   }
+  if (statewide_method==0) {
+    seed_I[ncounties,1,1]<-1
+  }
 }
-In<-seed_I
+#In<-seed_I
   
 #############################################################
 # get county populations
@@ -86,7 +90,11 @@ if (nage==1) {
     S[i,1,1]<-as.numeric(IN.pop.raw$est42010sex0_age999[i])*Pinf
     S[i,2:maxt,1]<-0
   }
-  S[ncounties,1,1]<-sum(S[1:ncounties-1,1,1])
+  if (statewide_pop==0) {
+    S[ncounties,1,1]<-sum(S[1:ncounties-1,1,1])
+  } else {
+    S[ncounties,1,1]<-statewide_pop
+  }
 } else if (nage==7) {
   for (i in 1:ncounties-1) {
 
@@ -216,6 +224,28 @@ Qcum<-array(0,dim=c(ncounties,maxt,nage))
 Gcum<-array(0,dim=c(ncounties,maxt,nage))
 
 dates<-c(seq.Date(day_zero_date,day_zero_date+maxt-1,"days"))
+
+if (statewide_method==2) {
+  urbrurS<-S
+  urbrurE<-E
+  urbrurI<-In
+  urbrurH<-H
+  urbrurQ<-Q
+  urbrurG<-G
+  urbrurD<-D
+  urbrurR<-R
+  urbrurEcum<-Ecum
+  urbrurIcum<-Icum
+  urbrurHcum<-Hcum
+  urbrurCcum<-Ccum
+  
+  dum<-read_csv("../CountyUrbanRural.csv")
+  dum<-dum%>%bind_cols(idx=1:(ncounties-1))
+  dum2<-dum%>%filter(Urban_Rural_Custom=="Urban")
+  urban_county_idx<-dum2$idx
+  dum2<-dum%>%filter(Urban_Rural_Custom=="Rural")
+  rural_county_idx<-dum2$idx
+}
 
 #################################################
 # comorbidities

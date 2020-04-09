@@ -12,12 +12,12 @@ intervention_time<-65 # days after day 0
 lift_time<-500 # days after day 0 that NPI is ceased
 
 # first case initialization method
-initialization_method<-2 # 0 seed each county with one case at day zero
+initialization_method<-0 # 0 seed each county with one case at day zero
                          # 1 seed each county at a different date
                          # 2 seed each county at a different date, reading in from file;
                          #   if no cases in county, set day zero to a month ago
 initialization_file<-"CountyFirstCase.csv" # for method 2
-day_zero_date<-0
+day_zero_date<-as.Date('2020-01-20')
 DayZeroOffset<-45
 
 
@@ -29,6 +29,9 @@ Tinf<-3 # time of infection before either hospitalization or recovery
 Thosp<-23 # time in hospitalization until recovery
 Tdeath<-18 # time in hospital until death
 Pinf<-1.0 # max proportion of population to get infected
+
+statewide_method<-2 # 0: simulate statewide; 1: sum up counties; 2: urban and rural
+statewide_pop<-0#6.692e6 # set to zero to get from census file; only valid for nage=1
 
 #nage=7 # number of age groups
 age60<-6#5 # index of age group that is sixty

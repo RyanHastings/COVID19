@@ -27,9 +27,13 @@ library(readxl)
 
 R0<-2.8
 intervention_R_rdxn<-0.8
-nage<-8
+nage<-1
 model_comorbidities<-0
 
+R0urban<-3.0
+R0rural<-2.6
+intervention_R_rdxn_urban<-0.9
+intervention_R_rdxn_rural<-0.7
 
 Rdeath<-c(seq(0,nage))
 Rhosp<-c(seq(0,nage))
@@ -51,7 +55,11 @@ if (nage==1 & model_comorbidities==1) {
   Rhosp[1]<-0.06
 }
 
-output_base<-paste("Scenario_R",format(R0,nsmall=1),"_",100*intervention_R_rdxn,"rdxn_",tag,sep="")
+#output_base<-paste("Scenario_R",format(R0,nsmall=1),"_",100*intervention_R_rdxn,"rdxn_",tag,sep="")
+output_base<-paste("Scenario_R",format(R0,nsmall=1),"_",100*intervention_R_rdxn,
+                   "rdxn_urbanR",format(R0urban,nsmall=1),"_",100*intervention_R_rdxn_urban,
+                   "rdxn_ruralR",format(R0rural,nsmall=1),"_",100*intervention_R_rdxn_rural,
+                   "rdxn_",tag,sep="")
 
 model_outfile<-paste(output_base,".csv",sep="")
 param_outfile<-paste(output_base,"_param.txt",sep="")
