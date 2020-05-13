@@ -59,4 +59,6 @@ for (a in 1:nage) {
   Icum[i,t,a]=Icum[i,t-1,a]+term2
   Hcum[i,t,a]=Hcum[i,t-1,a]+Rhosp[a]*term3
   Ccum[i,t,a]=Ccum[i,t-1,a]+Rcrit*term3
+  
+  Dday[i,t,a]=dDdt[i,t,a]
 }

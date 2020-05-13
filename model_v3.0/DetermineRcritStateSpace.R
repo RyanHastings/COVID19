@@ -1,6 +1,13 @@
-# fitting critical curve
-
-# first generate a series of curves keeping R0 constant but varying intervention_R_rdxn and Rcrit
+##############################################################
+# DetermineRcritStateSpace.R
+#
+# Depracated by Fit3curves.R.  This originally generated a state
+# space holding R0 constant (determined by fitting the death curve)
+# and varying intervention_R_rdxn and Rcrit.  Intended to be fitted
+# to the ICU curve.
+##############################################################
+# Ryan Hastings, 5 May 2020
+##############################################################
 
 rm(list=ls()) # clear out variables
 
@@ -14,18 +21,19 @@ library(ggplot2)
 library(haven)
 library(readxl)
 
-maxt=300
-R0=2.8
-Rcrit_vec<-seq(0.01,0.03,0.001)
-#R0_vec<-c(seq(2.85,2.95,0.005))
-intervention_R_rdxn_vec<-c(seq(0.0,0.95,0.05))
-times<-c(seq(0,maxt))
-nvars<-12
-Npop<-6.692e6
+###############################################################
+maxt=300 # maximum number of time steps
+R0=2.95 # base transmission rate
+Rcrit_vec<-seq(0.01,0.03,0.001) # field of Rcrit over which to simulate
+intervention_R_rdxn_vec<-c(seq(0.0,0.95,0.05)) # field of intervention_R_rdxn over which to simulate
+times<-c(seq(0,maxt)) # set up times array
+nvars<-12 # number of variables in output
+Npop<-6.692e6 # state population
 
-
+# set up state space
 StateSpace<-array(0.0,dim=c(length(Rcrit_vec),length(intervention_R_rdxn_vec),nvars,maxt))
 
+# loop and run model
 for (Rcriti in 1:length(Rcrit_vec)) {
   for (intervention_R_rdxn_i in 1:length(intervention_R_rdxn_vec)) {
     
@@ -34,7 +42,6 @@ for (Rcriti in 1:length(Rcrit_vec)) {
     
     Rdeath<-0.0066
     Rhosp<-0.03
-#    Rcrit<-0.013
     print(paste("Rcrit=",Rcrit,",rdxn=",intervention_R_rdxn))
     outdir<-"StateSpace/"
     
@@ -52,6 +59,7 @@ for (Rcriti in 1:length(Rcrit_vec)) {
     
     output<-1 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
     
+    # run the model
     source("DetermineStateSpace_initalization.R")
     source("DetermineStateSpace_dynamics.R")
     source("StateSpaceCrit_out.R")
@@ -59,4 +67,3 @@ for (Rcriti in 1:length(Rcrit_vec)) {
 }
 
 save(StateSpace,file='StateSpace_Crit.RData')
-

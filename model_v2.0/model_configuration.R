@@ -5,18 +5,19 @@
 ###################################################################
 #
 datadir<-("../../../COVID19Response/")
-outdir<- ("../../../COVID19Response/20200408/")
+outdir<- ("../../../COVID19Response/20200506/")
 
 # NPI timing
 intervention_time<-65 # days after day 0
-lift_time<-500 # days after day 0 that NPI is ceased
+#lift_time<-500 # days after day 0 that NPI is ceased
 
 # first case initialization method
-initialization_method<-0 # 0 seed each county with one case at day zero
+initialization_method<-2 # 0 seed each county with one case at day zero
                          # 1 seed each county at a different date
                          # 2 seed each county at a different date, reading in from file;
                          #   if no cases in county, set day zero to a month ago
 initialization_file<-"CountyFirstCase.csv" # for method 2
+fractional_initialization<-0
 day_zero_date<-as.Date('2020-01-20')
 DayZeroOffset<-45
 
@@ -26,12 +27,12 @@ DayZeroOffset<-45
 #intervention_R_rdxn<-0.25 # amount by which R0 is reduced by NPI
 Tinc<-5 # incubation time (days)
 Tinf<-3 # time of infection before either hospitalization or recovery
-Thosp<-23 # time in hospitalization until recovery
-Tdeath<-18 # time in hospital until death
+Thosp<-8.6 # time in hospitalization until recovery
+Tdeath<-10.4 # time in hospital until death
 Pinf<-1.0 # max proportion of population to get infected
 
-statewide_method<-2 # 0: simulate statewide; 1: sum up counties; 2: urban and rural
-statewide_pop<-0#6.692e6 # set to zero to get from census file; only valid for nage=1
+statewide_method<-1 # 0: simulate statewide; 1: sum up counties; 2: urban and rural
+statewide_pop<-6.692e6 # set to zero to get from census file; only valid for nage=1
 
 #nage=7 # number of age groups
 age60<-6#5 # index of age group that is sixty
@@ -75,9 +76,9 @@ Rdeath<-Rdeath/2.63 # because the death rate is WAY TOO HIGH if I don't do this
   Rhosp<-Rhosp*0.449
   Rdeath<-Rdeath*0.36667
 }
-Rcrit=0.024#/5 # proportion to be critically hospitalized
+Rcrit=0.01#0.026#/5 # proportion to be critically hospitalized
 
-maxt=301 # max time
+maxt=350 # max time
 ncounties=92 # number of counties
 state_name<-"Indiana"
 

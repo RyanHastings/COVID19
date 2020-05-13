@@ -19,6 +19,7 @@ Ecumout<-array(0,dim=c(ncounties,maxt))
 Icumout<-array(0,dim=c(ncounties,maxt))
 Hcumout<-array(0,dim=c(ncounties,maxt))
 Ccumout<-array(0,dim=c(ncounties,maxt))
+DdayOut<-array(0,dim=c(ncounties,maxt))
 
 for (a in 1:nage) {
   Sout<-Sout+S[,,a]
@@ -32,6 +33,7 @@ for (a in 1:nage) {
   Icumout<-Icumout+Icum[,,a]
   Hcumout<-Hcumout+Hcum[,,a]
   Ccumout<-Ccumout+Ccum[,,a]
+  DdayOut<-DdayOut+Dday[,,a]
 }
 
 # compute percent infected
@@ -42,17 +44,17 @@ for (i in 1:ncounties) {
     percent_infected[i,t]=round(100*Icumout[i,t]/Nout[i,1])
   }
 }
-# 
+# # 
 # # make a plot of Marion county
 # df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[49,],"E"=Eout[49,],
 #                       "I"=Iout[49,],"R"=Rout[49,],
-#                       "D"=Dout[49,],"H"=Hout[49,],"C"=Cout[49,])
+#                       "D"=Dout[49,],"H"=Hout[49,],"C"=Cout[49,],"dates"=dates,"Dday"=DdayOut[49,])
 # # df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
 # #                       "I"=Iout[1,],"R"=Rout[1,],
 # #                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
 # df.Marion<-df.Marion%>% mutate(N=S+E+I+R+C+H+D)
-# print(ggplot(df.Marion,aes(x=t))+
-#         scale_x_continuous(breaks=seq(0,300,30),name="days")+
+# print(ggplot(df.Marion,aes(x=dates))+
+#        # scale_x_continuous(breaks=seq(0,300,30),name="days")+
 #       #  geom_line(aes(y=S,color="susceptible"))+
 #        # geom_line(aes(y=E,color="exposed"))+
 #         geom_line(aes(y=I,color="infectious"))+
@@ -64,28 +66,29 @@ for (i in 1:ncounties) {
 #         ggtitle(paste(output_base,"Marion"))
 # )
 # ggsave(paste(outdir,output_base,'_Marion.png',sep=""))
-# 
-# df.Indiana<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[93,],"E"=Eout[93,],
-#                       "I"=Iout[93,],"R"=Rout[93,],
-#                       "D"=Dout[93,],"H"=Hout[93,],"C"=Cout[93,])
+# # 
+df.Indiana<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[93,],"E"=Eout[93,],
+                      "I"=Iout[93,],"R"=Rout[93,],
+                      "D"=Dout[93,],"H"=Hout[93,],"C"=Cout[93,],"dates"=dates)#,"Dday"=DdayOut[93,,1])
 # # df.Marion<-data.frame("t"=(seq(0,maxt-1)),"S"=Sout[1,],"E"=Eout[1,],
 # #                       "I"=Iout[1,],"R"=Rout[1,],
 # #                       "D"=Dout[1,],"H"=Hout[1,],"C"=Cout[1,])
 # df.Indiana<-df.Indiana%>% mutate(N=S+E+I+R+C+H+D)
-# print(ggplot(df.Indiana,aes(x=t))+
-#         scale_x_continuous(breaks=seq(0,300,30),name="days")+
-#         #  geom_line(aes(y=S,color="susceptible"))+
-#         # geom_line(aes(y=E,color="exposed"))+
-#         geom_line(aes(y=I,color="infectious"))+
-#         # geom_line(aes(y=R,color="removed"))+
-#         geom_line(aes(y=D,color="deceased"))+
-#         # geom_line(aes(y=N,color="total"))+
-#         geom_line(aes(y=H,color="hospitalized"))+
-#         geom_line(aes(y=C,color="critical"))+
-#         ggtitle(paste(output_base,"Indiana"))
-# )
-# # ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
-# 
+print(ggplot(df.Indiana,aes(x=dates))+
+        #scale_x_continuous(breaks=seq(0,300,30),name="days")+
+        #  geom_line(aes(y=S,color="susceptible"))+
+        # geom_line(aes(y=E,color="exposed"))+
+      #  geom_line(aes(y=I,color="infectious"))+
+        # geom_line(aes(y=R,color="removed"))+
+        geom_line(aes(y=D,color="deceased"))+
+        # geom_line(aes(y=N,color="total"))+
+        geom_line(aes(y=H,color="hospitalized"))+
+        geom_line(aes(y=C,color="critical"))+
+        #ggtitle(paste(output_base,"Indiana"))
+        ggtitle("Indiana")
+)
+# ggsave(paste(outdir,output_base,'_Indiana.png',sep=""))
+#
 
 #######################################################
 # output files
@@ -105,6 +108,7 @@ if (output==1) {
                   "Critical"=format(round(Cout[1,]),digits=7),
                   "CriticalCumulative"=format(round(Ccumout[1,]),digits=7),
                   "Deceased"=format(round(Dout[1,]),digits=7),
+                  "DeathsPerDay"=format(round(DdayOut[1,]),digits=7),
                   "PercentInfected"=round(percent_infected[1,]))
   
   for (i in 2:ncounties) {
@@ -121,6 +125,7 @@ if (output==1) {
                     "Critical"=format(round(Cout[i,]),digits=7),
                     "CriticalCumulative"=format(round(Ccumout[i,]),digits=7),
                     "Deceased"=format(round(Dout[i,]),digits=7),
+                    "DeathsPerDay"=format(round(DdayOut[i,]),digits=7),
                     "PercentInfected"=round(percent_infected[i,]))
     df1<-df1%>%bind_rows(df2)
 

@@ -30,7 +30,7 @@ if (initialization_method==0) {
   init_data<-init_data%>%mutate(DayFromDayZero=DayZero-day_zero_date)
   for (i in 1:ncounties-1) {
     t<-init_data$DayFromDayZero[i]+1
-    seed_I[i,t,1]<-1
+    seed_I[i,t,1]<-0.25
   }
   if (statewide_method==0) {
     seed_I[ncounties,1,1]<-1
@@ -186,6 +186,25 @@ if (nage==1) {
   S[ncounties,1,8]=sum(S[1:ncounties-1,1,8])
 }
 
+if (fractional_initialization==1) {
+  
+  dum2<-0
+  for (a in 1:nage) {
+    dum2<-dum2+S[ncounties,1,a]
+  }
+  for (i in 1:ncounties-1) {
+    
+    dum<-0
+    for (a in 1:nage) {
+      dum<-dum+S[i,1,a]
+    }
+    frac<-dum/dum2
+    seed_I[i,,1]<-seed_I[i,,1]*frac
+    print(paste(i,frac))
+  }
+  
+  
+}
 
 
 ##########################################################
@@ -215,6 +234,7 @@ dGdt<-array(0,dim=c(ncounties,maxt,nage))
   
 D<-array(0,dim=c(ncounties,maxt,nage))
 dDdt<-array(0,dim=c(ncounties,maxt,nage))
+Dday<-array(0,dim=c(ncounties,maxt,nage))
     
 Ecum<-array(0,dim=c(ncounties,maxt,nage))
 Icum<-array(0,dim=c(ncounties,maxt,nage))

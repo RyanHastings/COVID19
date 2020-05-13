@@ -1,13 +1,16 @@
+###########################################################
+# DetermineStateSpace_initialization.R
+#
+# Initialize variables for DetermineStateSpace model runs.
+###########################################################
+# Ryan Hastings, 5 May 2020
+###########################################################
 
 In<-c(rep(0,maxt))
 In[1]<-1
 
 S<-c(rep(0,maxt))
 S[1]<-Npop
-
-##########################################################
-# Initialize other variables
-
 dSdt<-c(rep(0,maxt))
 
 E<-c(rep(0,maxt))
@@ -32,6 +35,7 @@ dGdt<-c(rep(0,maxt))
 
 D<-c(rep(0,maxt))
 dDdt<-c(rep(0,maxt))
+Dday<-c(rep(0,maxt))
 
 Ecum<-c(rep(0,maxt))
 Icum<-c(rep(0,maxt))
