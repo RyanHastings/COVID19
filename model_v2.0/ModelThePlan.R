@@ -29,7 +29,7 @@ Rhosp<-0.0278 # hospitalization rate
 Rcrit<-0.0094 # ICU rate
 Rdeath<-0.004884 # IFR
 
-outdir<-'out/20200511/' # outdir
+outdir<-'../../../COVID19Response/model_v2.0_out/20200520/' # outdir
 
 # dates for each phase
 DayZero<-as.Date('2020-01-20')
@@ -41,10 +41,10 @@ PhaseFiveDate<-as.Date('2020-07-04')
 
 # reduction amounts for each phase
 PhaseOneReduction<-0.7
-PhaseTwoReduction<-0.7-0.7*0.25
-PhaseThreeReduction<-0.7-0.7*0.5
-PhaseFourReduction<-0.7-0.7*0.75
-PhaseFiveReduction<-0.0
+PhaseTwoReduction<-0.6
+PhaseThreeReduction<-0.5
+PhaseFourReduction<-0.4
+PhaseFiveReduction<-0.4
 
 ############################m model run ################
 
@@ -69,60 +69,60 @@ D.frame<-data.frame( Date=dates,
 
 ##################### model run #########################
 
-PhaseTwoReduction<-0.0
-PhaseThreeReduction<-0.0
-PhaseFourReduction<-0.0
-PhaseFiveReduction<-0.0
+# PhaseTwoReduction<-0.0
+# PhaseThreeReduction<-0.0
+# PhaseFourReduction<-0.0
+# PhaseFiveReduction<-0.0
+# 
+# source("ModelThePlan_initialization.R")
+# source("ModelThePlan_dynamics.R")
+# 
+# #--------------------- output --------------------------#
 
-source("ModelThePlan_initialization.R")
-source("ModelThePlan_dynamics.R")
-
-#--------------------- output --------------------------#
-
-D.frame2<-data.frame( Date=dates,
-                     Day=day,
-                     #Susceptible=S,
-                     #Infectious=In,
-                     Hospitalized=round(H+Q+G),
-                     Critical=round(Q+G),
-                     DeathsPerDay=round(Dday),
-                     #CumulativeExposed=Ecum,
-                     #CumulativeInfectious=Icum,
-                     #CumulativeHospitalized=Hcum,
-                     #CumulativeCritical=Ccum,
-                     CumulativeDeaths=round(D) )
-
-D.frame<-bind_rows(D.frame,D.frame2)
-
-##################### program output #####################
-
-#----------------- prepare output table -----------------#
-forecast_model<-rep("seir_isdh",maxt*4)
-forecast_assumptions<-c(rep("ISDH_1",maxt*2),rep("No_Reduction",maxt*2))
-forecast_version<-rep("2020-05-11",maxt*4)
-forecast_version_current<-rep(1,maxt*4)
-location_geography_level<-rep("state",maxt*4)
-location_name<-rep("Indiana",maxt*4)
-location_id<-rep(18,maxt*4)
-date<-rep(dates,4)
-variable<-c(rep("hospital_census_total_covid",maxt),rep("hospital_consus_icu_covid",maxt),
-            rep("hospital_census_total_covid",maxt),rep("hospital_consus_icu_covid",maxt))
-forecast<-append(D.frame$Hospitalized[1:maxt],D.frame$Critical[1:maxt])
-forecast<-append(forecast,D.frame2$Hospitalized[1:maxt])
-forecast<-append(forecast,D.frame2$Critical)
-
-Output.Table<-data.frame(forecast_model,
-                         forecast_assumptions,
-                         forecast_version,
-                         forecast_version_current,
-                         location_geography_level,
-                         location_name,
-                         location_id,
-                         date,
-                         variable,
-                         forecast)
-write_csv(Output.Table,path=paste(outdir,"SEIR_ISDH_output.csv",sep=""))
-
+# D.frame2<-data.frame( Date=dates,
+#                      Day=day,
+#                      #Susceptible=S,
+#                      #Infectious=In,
+#                      Hospitalized=round(H+Q+G),
+#                      Critical=round(Q+G),
+#                      DeathsPerDay=round(Dday),
+#                      #CumulativeExposed=Ecum,
+#                      #CumulativeInfectious=Icum,
+#                      #CumulativeHospitalized=Hcum,
+#                      #CumulativeCritical=Ccum,
+#                      CumulativeDeaths=round(D) )
+# 
+# D.frame<-bind_rows(D.frame,D.frame2)
+# 
+# ##################### program output #####################
+# 
+# #----------------- prepare output table -----------------#
+# forecast_model<-rep("seir_isdh",maxt*4)
+# forecast_assumptions<-c(rep("ISDH_1",maxt*2),rep("No_Reduction",maxt*2))
+# forecast_version<-rep("2020-05-11",maxt*4)
+# forecast_version_current<-rep(1,maxt*4)
+# location_geography_level<-rep("state",maxt*4)
+# location_name<-rep("Indiana",maxt*4)
+# location_id<-rep(18,maxt*4)
+# date<-rep(dates,4)
+# variable<-c(rep("hospital_census_total_covid",maxt),rep("hospital_consus_icu_covid",maxt),
+#             rep("hospital_census_total_covid",maxt),rep("hospital_consus_icu_covid",maxt))
+# forecast<-append(D.frame$Hospitalized[1:maxt],D.frame$Critical[1:maxt])
+# forecast<-append(forecast,D.frame2$Hospitalized[1:maxt])
+# forecast<-append(forecast,D.frame2$Critical)
+# 
+# Output.Table<-data.frame(forecast_model,
+#                          forecast_assumptions,
+#                          forecast_version,
+#                          forecast_version_current,
+#                          location_geography_level,
+#                          location_name,
+#                          location_id,
+#                          date,
+#                          variable,
+#                          forecast)
+# write_csv(Output.Table,path=paste(outdir,"SEIR_ISDH_output.csv",sep=""))
+# 
 
 ####################### plotting ###############################
 
@@ -130,7 +130,7 @@ write_csv(Output.Table,path=paste(outdir,"SEIR_ISDH_output.csv",sep=""))
 # plt<-ggplot(D.frame,aes(x=Date))+geom_ribbon(aes(ymin=Hlow,ymax=Hospitalized,color="Hospital beds"),alpha="0.5",fill="red")+
 #   geom_ribbon(aes(ymin=Clow,ymax=Critical,color="ICU  beds"),alpha="0.5",fill="blue")
 # print(plt)
-plt<-ggplot(D.frame1,aes(x=Date))+geom_line(aes(y=Hospitalized,color="Hospital Beds"))+
+plt<-ggplot(D.frame,aes(x=Date))+geom_line(aes(y=Hospitalized,color="Hospital Beds"))+
   geom_line(aes(y=Critical,color="ICU beds"))+
   geom_line(aes(y=DeathsPerDay,color="Deaths per day"))+
   geom_line(aes(y=CumulativeDeaths,color="Total Deaths"))

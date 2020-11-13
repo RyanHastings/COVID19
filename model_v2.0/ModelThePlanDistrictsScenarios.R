@@ -30,7 +30,7 @@ DayZeroOffset<-55 # difference in days between first death in district and day z
 init_filename<-'../../../COVID19Response/CountyFirstCase.csv' # first death cases
 state_name<-'Indiana'
 state_name<-paste(",",state_name)
-outdir<-'out/20200512/'
+outdir<-'../../../COVID19Response/model_v2.0_out/20200521/'
 
 # reductions in transmission rate by district
 PhaseOneReduction_vec<-c(0.65,0.5,0.65,0.45,0.75,0.7,0.7,0.6,0.7,0.55)
@@ -58,71 +58,199 @@ for (n in 1:10) {
   Rhosp<-Rhosp_vec[n]
   Rcrit<-Rcrit_vec[n]
 
-  source("ModelThePlanDistricts_initialization.R")
-  source("ModelThePlanDistricts_dynamics.R")
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # # create data frame
+  # D.frame1<-data.frame( Date=dates,
+  #                       Day=day,
+  #                       #Susceptible=S,
+  #                       #Infectious=In,
+  #                       HospitalizedUpper=round(H+Q+G),
+  #                       HospitalizedLower=round(H+Q+G),
+  #                       Hospitalized=round(H+Q+G),
+  #                       CriticalUpper=round(Q+G),
+  #                       CriticalLower=round(Q+G),
+  #                       Critical=round(Q+G),
+  #                       DeathsPerDayUpper=round(Dday),
+  #                       DeathsPerDayLower=round(Dday),
+  #                       DeathsPerDay=round(Dday),
+  #                       #CumulativeExposed=Ecum,
+  #                       #CumulativeInfectious=Icum,
+  #                       #CumulativeHospitalized=Hcum,
+  #                       #CumulativeCritical=Ccum,
+  #                       CumulativeDeathsUpper=round(D),
+  #                       CumulativeDeathsLower=round(D),
+  #                       CumulativeDeaths=round(D) )
+  # 
+  # ################### Scenario Two ############################
+  # print("scenario 2")
+  # R0<-R0_vec[n]
+  # PhaseOneDate<-as.Date('2020-03-25')
+  # PhaseOneReduction<-PhaseOneReduction_vec[n]
+  # PhaseTwoDate<-as.Date('2020-05-04')
+  # PhaseTwoReduction<-PhaseTwoReduction_vec[n]
+  # PhaseThreeReduction<-0.0
+  # PhaseFourReduction<-0.0
+  # PhaseFiveReduction<-0.0
+  # print(R0)
+  # print(PhaseOneReduction)
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # # create data frame
+  # D.frame2<-data.frame( Date=dates,
+  #                       Day=day,
+  #                       #Susceptible=S,
+  #                       #Infectious=In,
+  #                       HospitalizedUpper=round(H+Q+G),
+  #                       CriticalUpper=round(Q+G),
+  #                       DeathsPerDayUpper=round(Dday),
+  #                       #CumulativeExposed=Ecum,
+  #                       #CumulativeInfectious=Icum,
+  #                       #CumulativeHospitalized=Hcum,
+  #                       #CumulativeCritical=Ccum,
+  #                       CumulativeDeathsUpper=round(D) )
+  # 
+  # PhaseTwoReduction<-PhaseOneReduction_vec[n]-PhaseOneReduction_vec[n]/7
+  # 
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # D.frame2<-D.frame2%>%bind_cols( 
+  #                       #Susceptible=S,
+  #                       #Infectious=In,
+  #                       Hospitalized=round(H+Q+G),
+  #                       Critical=round(Q+G),
+  #                       DeathsPerDay=round(Dday),
+  #                       #CumulativeExposed=Ecum,
+  #                       #CumulativeInfectious=Icum,
+  #                       #CumulativeHospitalized=Hcum,
+  #                       #CumulativeCritical=Ccum,
+  #                       CumulativeDeaths=round(D) )
+  # 
+  # PhaseTwoReduction<-0.7
+  # 
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # D.frame2<-D.frame2%>%bind_cols( 
+  #                       #Susceptible=S,
+  #                       #Infectious=In,
+  #                       HospitalizedLower=round(H+Q+G),
+  #                       CriticalLower=round(Q+G),
+  #                       DeathsPerDayLower=round(Dday),
+  #                       #CumulativeExposed=Ecum,
+  #                       #CumulativeInfectious=Icum,
+  #                       #CumulativeHospitalized=Hcum,
+  #                       #CumulativeCritical=Ccum,
+  #                       CumulativeDeathsLower=round(D) )
+  # 
+  # ################### Scenario Three ##########################
+  # print("scenario 3")
+  # R0<-R0_vec[n]
+  # PhaseOneDate<-as.Date('2020-03-25')
+  # PhaseOneReduction<-PhaseOneReduction_vec[n]
+  # PhaseTwoDate<-as.Date('2020-05-04')
+  # PhaseTwoReduction<-PhaseTwoReduction_vec[n]
+  # PhaseThreeDate<-as.Date('2020-05-24')
+  # PhaseThreeReduction<-PhaseThreeReduction_vec[n]
+  # PhaseFourReduction<-0.0
+  # PhaseFiveReduction<-0.0
+  # 
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # # create data frame
+  # D.frame3<-data.frame( Date=dates,
+  #                       Day=day,
+  #                       #Susceptible=S,
+  #                       #Infectious=In,
+  #                       HospitalizedUpper=round(H+Q+G),
+  #                       CriticalUpper=round(Q+G),
+  #                       DeathsPerDayUpper=round(Dday),
+  #                       #CumulativeExposed=Ecum,
+  #                       #CumulativeInfectious=Icum,
+  #                       #CumulativeHospitalized=Hcum,
+  #                       #CumulativeCritical=Ccum,
+  #                       CumulativeDeathsUpper=round(D) )
+  # 
+  # PhaseTwoReduction<-PhaseOneReduction_vec[n]-PhaseOneReduction_vec[n]/7
+  # PhaseThreeReduction<-PhaseOneReduction_vec[n]-PhaseOneReduction_vec[n]*2/7
+  # 
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # D.frame3<-D.frame3%>%bind_cols( 
+  #                       #Susceptible=S,
+  #                       #Infectious=In,
+  #                       Hospitalized=round(H+Q+G),
+  #                       Critical=round(Q+G),
+  #                       DeathsPerDay=round(Dday),
+  #                       #CumulativeExposed=Ecum,
+  #                       #CumulativeInfectious=Icum,
+  #                       #CumulativeHospitalized=Hcum,
+  #                       #CumulativeCritical=Ccum,
+  #                       CumulativeDeaths=round(D) )
+  # 
+  # PhaseTwoReduction<-0.7
+  # PhaseThreeReduction<-0.7
+  # 
+  # source("ModelThePlanDistricts_initialization.R")
+  # source("ModelThePlanDistricts_dynamics.R")
+  # 
+  # D.frame3<-D.frame3%>%bind_cols( 
+  #   #Susceptible=S,
+  #   #Infectious=In,
+  #   HospitalizedLower=round(H+Q+G),
+  #   CriticalLower=round(Q+G),
+  #   DeathsPerDayLower=round(Dday),
+  #   #CumulativeExposed=Ecum,
+  #   #CumulativeInfectious=Icum,
+  #   #CumulativeHospitalized=Hcum,
+  #   #CumulativeCritical=Ccum,
+  #   CumulativeDeathsLower=round(D) )
+  # 
+  # D.frame<-bind_rows(D.frame1,D.frame2,D.frame3)
   
-  # create data frame
-  D.frame1<-data.frame( Date=dates,
-                        Day=day,
-                        #Susceptible=S,
-                        #Infectious=In,
-                        Hospitalized=round(H+Q+G),
-                        Critical=round(Q+G),
-                        DeathsPerDay=round(Dday),
-                        #CumulativeExposed=Ecum,
-                        #CumulativeInfectious=Icum,
-                        #CumulativeHospitalized=Hcum,
-                        #CumulativeCritical=Ccum,
-                        CumulativeDeaths=round(D) )
-  
-  ################### Scenario Two ############################
-  print("scenario 2")
+  ################### Scenario Four #########################
+  print("scenario 4")
   R0<-R0_vec[n]
   PhaseOneDate<-as.Date('2020-03-25')
   PhaseOneReduction<-PhaseOneReduction_vec[n]
   PhaseTwoDate<-as.Date('2020-05-04')
   PhaseTwoReduction<-PhaseTwoReduction_vec[n]
-  PhaseThreeReduction<-0.0
-  PhaseFourReduction<-0.0
-  PhaseFiveReduction<-0.0
-  print(R0)
-  print(PhaseOneReduction)
-  source("ModelThePlanDistricts_initialization.R")
-  source("ModelThePlanDistricts_dynamics.R")
-  
-  # create data frame
-  D.frame2<-data.frame( Date=dates,
-                        Day=day,
-                        #Susceptible=S,
-                        #Infectious=In,
-                        Hospitalized=round(H+Q+G),
-                        Critical=round(Q+G),
-                        DeathsPerDay=round(Dday),
-                        #CumulativeExposed=Ecum,
-                        #CumulativeInfectious=Icum,
-                        #CumulativeHospitalized=Hcum,
-                        #CumulativeCritical=Ccum,
-                        CumulativeDeaths=round(D) )
-  
-  
-  ################### Scenario Three ##########################
-  print("scenario 3")
-  R0<-R0_vec[n]
-  PhaseOneDate<-as.Date('2020-03-25')
-  PhaseOneReduction<-PhaseOneReduction_vec[n]
-  PhaseTwoDate<-as.Date('2020-05-04')
-  PhaseTwoReduction<-PhaseTwoReduction_vec[n]
-  PhaseThreeDate<-as.Date('2020-05-24')
+  PhaseThreeDate<-as.Date('2020-05-22')
   PhaseThreeReduction<-PhaseThreeReduction_vec[n]
-  PhaseFourReduction<-0.0
+  PhaseFourDate<-as.Date('2020-06-14')
+  PhaseFourReduction<-PhaseFourReduction_vec[n]
   PhaseFiveReduction<-0.0
-  
+
   source("ModelThePlanDistricts_initialization.R")
   source("ModelThePlanDistricts_dynamics.R")
-  
+
   # create data frame
-  D.frame3<-data.frame( Date=dates,
+  D.frame<-data.frame( Date=dates,
                         Day=day,
+                        #Susceptible=S,
+                        #Infectious=In,
+                        HospitalizedUpper=round(H+Q+G),
+                        CriticalUpper=round(Q+G),
+                        DeathsPerDayUpper=round(Dday),
+                        #CumulativeExposed=Ecum,
+                        #CumulativeInfectious=Icum,
+                        #CumulativeHospitalized=Hcum,
+                        #CumulativeCritical=Ccum,
+                        CumulativeDeathsUpper=round(D) )
+
+  PhaseTwoReduction<-PhaseOneReduction_vec[n]-PhaseOneReduction_vec[n]/7
+  PhaseThreeReduction<-PhaseOneReduction_vec[n]-PhaseOneReduction_vec[n]*2/7
+  PhaseFourReduction<-PhaseOneReduction_vec[n]-PhaseOneReduction_vec[n]*3/7
+
+  source("ModelThePlanDistricts_initialization.R")
+  source("ModelThePlanDistricts_dynamics.R")
+
+  D.frame<-D.frame%>%bind_cols(
                         #Susceptible=S,
                         #Infectious=In,
                         Hospitalized=round(H+Q+G),
@@ -133,31 +261,101 @@ for (n in 1:10) {
                         #CumulativeHospitalized=Hcum,
                         #CumulativeCritical=Ccum,
                         CumulativeDeaths=round(D) )
-  
-  
-  
-  
-  D.frame<-bind_rows(D.frame1,D.frame2,D.frame3)
+
+  PhaseTwoReduction<-0.7
+  PhaseThreeReduction<-0.7
+  PhaseFourReduction<-0.7
+
+  source("ModelThePlanDistricts_initialization.R")
+  source("ModelThePlanDistricts_dynamics.R")
+
+  D.frame<-D.frame%>%bind_cols(
+    #Susceptible=S,
+    #Infectious=In,
+    HospitalizedLower=round(H+Q+G),
+    CriticalLower=round(Q+G),
+    DeathsPerDayLower=round(Dday),
+    #CumulativeExposed=Ecum,
+    #CumulativeInfectious=Icum,
+    #CumulativeHospitalized=Hcum,
+    #CumulativeCritical=Ccum,
+    CumulativeDeathsLower=round(D) )
+
   
   ######################## output #############################
   
   #---------------- prepare output table ---------------------#
-  forecast_model<-rep("seir_isdh",maxt*6)
-  forecast_assumptions<-c(rep("Scenario 1",maxt*2),rep("Scenario 2",maxt*2),rep("Scenario 3",maxt*2))
-  forecast_version<-rep("2020-05-11",maxt*6)
-  forecast_version_current<-rep(1,maxt*6)
-  location_geography_level<-rep("district",maxt*6)
-  location_name<-rep(paste("District",n),maxt*6)
-  location_id<-rep(n,maxt*6)
-  date<-rep(dates,6)
-  variable<-c(rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt),
-              rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt),
-              rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt))
-  forecast<-append(D.frame1$Hospitalized[1:maxt],D.frame1$Critical[1:maxt])
-  forecast<-append(forecast,D.frame2$Hospitalized[1:maxt])
-  forecast<-append(forecast,D.frame2$Critical)
-  forecast<-append(forecast,D.frame3$Hospitalized)
-  forecast<-append(forecast,D.frame3$Critical)
+  # forecast_model<-rep("seir_isdh",maxt*6)
+  # forecast_assumptions<-c(rep("Scenario 1",maxt*2),rep("Scenario 2",maxt*2),rep("Scenario 3",maxt*2))
+  # forecast_version<-rep("2020-05-11",maxt*6)
+  # forecast_version_current<-rep(1,maxt*6)
+  # location_geography_level<-rep("district",maxt*6)
+  # location_name<-rep(paste("District",n),maxt*6)
+  # location_id<-rep(n,maxt*6)
+  # date<-rep(dates,6)
+  # variable<-c(rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt),
+  #             rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt),
+  #             rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt))
+  # forecast<-append(D.frame1$Hospitalized[1:maxt],D.frame1$Critical[1:maxt])
+  # forecast<-append(forecast,D.frame2$Hospitalized[1:maxt])
+  # forecast<-append(forecast,D.frame2$Critical)
+  # forecast<-append(forecast,D.frame3$Hospitalized)
+  # forecast<-append(forecast,D.frame3$Critical)
+  # 
+  # forecast_lower<-append(D.frame1$HospitalizedLower,D.frame1$CriticalLower)
+  # forecast_lower<-append(forecast_lower,D.frame2$HospitalizedLower)
+  # forecast_lower<-append(forecast_lower,D.frame2$CriticalLower)
+  # forecast_lower<-append(forecast_lower,D.frame3$HospitalizedLower)
+  # forecast_lower<-append(forecast_lower,D.frame3$CriticalLower)
+  # 
+  # forecast_upper<-append(D.frame1$HospitalizedUpper,D.frame1$CriticalUpper)
+  # forecast_upper<-append(forecast_upper,D.frame2$HospitalizedUpper)
+  # forecast_upper<-append(forecast_upper,D.frame2$CriticalUpper)
+  # forecast_upper<-append(forecast_upper,D.frame3$HospitalizedUpper)
+  # forecast_upper<-append(forecast_upper,D.frame3$CriticalUpper)
+  # 
+  # Output.Table<-data.frame(forecast_model,
+  #                          forecast_assumptions,
+  #                          forecast_version,
+  #                          forecast_version_current,
+  #                          location_geography_level,
+  #                          location_name,
+  #                          location_id,
+  #                          date,
+  #                          variable,
+  #                          forecast,
+  #                          forecast_lower,
+  #                          forecast_upper)
+  # write_csv(Output.Table,path=paste(outdir,"SEIR_ISDH_District",n,"_output.csv",sep=""))
+  
+  forecast_model<-rep("seir_isdh",maxt*2)
+  forecast_assumptions<-rep("Scenario 4",maxt*2)
+  forecast_version<-rep("2020-05-11",maxt*2)
+  forecast_version_current<-rep(1,maxt*2)
+  location_geography_level<-rep("district",maxt*2)
+  location_name<-rep(paste("District",n),maxt*2)
+  location_id<-rep(n,maxt*2)
+  date<-rep(dates,2)
+  variable<-c(rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt))#,
+            #  rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt),
+            #  rep("hospital_census_total_covid",maxt),rep("hospital_census_icu_covid",maxt))
+  forecast<-append(D.frame$Hospitalized[1:maxt],D.frame$Critical[1:maxt])
+  # forecast<-append(forecast,D.frame2$Hospitalized[1:maxt])
+  # forecast<-append(forecast,D.frame2$Critical)
+  # forecast<-append(forecast,D.frame3$Hospitalized)
+  # forecast<-append(forecast,D.frame3$Critical)
+  
+  forecast_lower<-append(D.frame$HospitalizedLower,D.frame$CriticalLower)
+  # forecast_lower<-append(forecast_lower,D.frame2$HospitalizedLower)
+  # forecast_lower<-append(forecast_lower,D.frame2$CriticalLower)
+  # forecast_lower<-append(forecast_lower,D.frame3$HospitalizedLower)
+  # forecast_lower<-append(forecast_lower,D.frame3$CriticalLower)
+  
+  forecast_upper<-append(D.frame$HospitalizedUpper,D.frame$CriticalUpper)
+  # forecast_upper<-append(forecast_upper,D.frame2$HospitalizedUpper)
+  # forecast_upper<-append(forecast_upper,D.frame2$CriticalUpper)
+  # forecast_upper<-append(forecast_upper,D.frame3$HospitalizedUpper)
+  # forecast_upper<-append(forecast_upper,D.frame3$CriticalUpper)
   
   Output.Table<-data.frame(forecast_model,
                            forecast_assumptions,
@@ -168,54 +366,75 @@ for (n in 1:10) {
                            location_id,
                            date,
                            variable,
-                           forecast)
+                           forecast,
+                           forecast_lower,
+                           forecast_upper)
   write_csv(Output.Table,path=paste(outdir,"SEIR_ISDH_District",n,"_output.csv",sep=""))
   
   ############################## plotting #####################
   
   
   #--------------- hospitalizations and ICU by county ------------------#
-  HospByRegion<-read_csv("../model_v3.0/DeathCurves/COVID_EMResources_By_Region_By_Date_Fix_0427.csv")
-  
-  dum<-as.Date(HospByRegion$Date,format='%m/%d/%y')
-  hosp_date1<-min(dum)
-  hosp_date2<-max(dum)
-  
-  h1<-as.numeric(hosp_date1-DayZero+1)
-  h2<-as.numeric(hosp_date2-DayZero+1)
-  
-  dum<-HospByRegion%>%filter(Region==n)
-  df.hosp<-data.frame( Dates=seq.Date(hosp_date1,hosp_date2,'days'),
-                       H=dum$`Beds COVID Total` )
-  #write_csv(df.hosp,path=paste(plt_outdir,'District',n,'_hosp.csv',sep=''))
-  df.crit<-data.frame( Dates=seq.Date(hosp_date1,hosp_date2,'days'),
-                       C=dum$`ICU Beds COVID Total`)
+  # HospByRegion<-read_csv("../model_v3.0/DeathCurves/COVID_EMResources_By_Region_By_Date_Fix_0427.csv")
+  # 
+  # dum<-as.Date(HospByRegion$Date,format='%m/%d/%y')
+  # hosp_date1<-min(dum)
+  # hosp_date2<-max(dum)
+  # 
+  # h1<-as.numeric(hosp_date1-DayZero+1)
+  # h2<-as.numeric(hosp_date2-DayZero+1)
+  # 
+  # dum<-HospByRegion%>%filter(Region==n)
+  # df.hosp<-data.frame( Dates=seq.Date(hosp_date1,hosp_date2,'days'),
+  #                      H=dum$`Beds COVID Total` )
+  # #write_csv(df.hosp,path=paste(plt_outdir,'District',n,'_hosp.csv',sep=''))
+  # df.crit<-data.frame( Dates=seq.Date(hosp_date1,hosp_date2,'days'),
+  #                      C=dum$`ICU Beds COVID Total`)
   #write_csv(df.crit,path=paste(plt_outdir,'District',n,'_ICU.csv',sep=''))
   
-  print( ggplot()+geom_point(data=df.hosp,aes(x=Dates,y=H))+
-           #  geom_line(data=df.MaxMin,aes(x=Dates,y=MaxHosp))+
-           #   geom_line(data=df.MaxMin,aes(x=Dates,y=MinHosp))+
-           xlim(hosp_date1-7,hosp_date2+14)+
-           geom_line(data=D.frame1,aes(x=Date,y=Hospitalized))+
-           geom_line(data=D.frame2,aes(x=Date,y=Hospitalized))+
-           geom_line(data=D.frame3,aes(x=Date,y=Hospitalized))+
-           #ylim(0,ylimH[n])+
-           # geom_ribbon(data=df.MaxMin,aes(x=Dates,ymin=MinHosp,ymax=MaxHosp),fill="red",alpha="0.5")+
-           ylab("Hospitalized")+ggtitle(n)
-  )
-  # ggsave(paste(plt_outdir,"district",n,"_plt12.png",sep=""))
-  print( ggplot()+geom_point(data=df.crit,aes(x=Dates,y=C))+
-           #geom_line(data=df.MaxMin,aes(x=Dates,y=MaxCrit))+
-           #geom_line(data=df.MaxMin,aes(x=Dates,y=MinCrit))+
-           #geom_ribbon(data=df.MaxMin,aes(x=Dates,ymin=MinCrit,ymax=MaxCrit),fill="red",alpha="0.5")+
-           xlim(hosp_date1-7,hosp_date2+14)+#ylim(0,ylimC[n])+
-           geom_line(data=D.frame1,aes(x=Date,y=Critical))+
-           geom_line(data=D.frame2,aes(x=Date,y=Critical))+
-           geom_line(data=D.frame3,aes(x=Date,y=Critical))+
-           ylab("ICU beds")+ggtitle(n)
-  )
-  
-  
+  # print( ggplot()+geom_point(data=df.hosp,aes(x=Dates,y=H))+
+  #          #  geom_line(data=df.MaxMin,aes(x=Dates,y=MaxHosp))+
+  #          #   geom_line(data=df.MaxMin,aes(x=Dates,y=MinHosp))+
+  #          xlim(hosp_date1-7,hosp_date2+14)+
+  #          geom_line(data=D.frame1,aes(x=Date,y=Hospitalized))+
+  #          geom_line(data=D.frame2,aes(x=Date,y=Hospitalized))+
+  #          geom_line(data=D.frame3,aes(x=Date,y=Hospitalized))+
+  #          #ylim(0,ylimH[n])+
+  #          # geom_ribbon(data=df.MaxMin,aes(x=Dates,ymin=MinHosp,ymax=MaxHosp),fill="red",alpha="0.5")+
+  #          ylab("Hospitalized")+ggtitle(n)
+  # )
+  # # ggsave(paste(plt_outdir,"district",n,"_plt12.png",sep=""))
+  # print( ggplot()+geom_point(data=df.crit,aes(x=Dates,y=C))+
+  #          #geom_line(data=df.MaxMin,aes(x=Dates,y=MaxCrit))+
+  #          #geom_line(data=df.MaxMin,aes(x=Dates,y=MinCrit))+
+  #          #geom_ribbon(data=df.MaxMin,aes(x=Dates,ymin=MinCrit,ymax=MaxCrit),fill="red",alpha="0.5")+
+  #          xlim(hosp_date1-7,hosp_date2+14)+#ylim(0,ylimC[n])+
+  #          geom_line(data=D.frame1,aes(x=Date,y=Critical))+
+  #          geom_line(data=D.frame2,aes(x=Date,y=Critical))+
+  #          geom_line(data=D.frame3,aes(x=Date,y=Critical))+
+  #          ylab("ICU beds")+ggtitle(n)
+  # )
+  # 
+  # print( ggplot(D.frame1,aes(x=Date))+geom_line(aes(y=Hospitalized))+
+  #          geom_ribbon(aes(ymin=HospitalizedLower,ymax=HospitalizedUpper,alpha=0.5))+
+  #          ggtitle("Scenario 1"))
+  # print( ggplot(D.frame1,aes(x=Date))+geom_line(aes(y=Critical))+
+  #          geom_ribbon(aes(ymin=CriticalLower,ymax=CriticalUpper,alpha=0.5))+
+  #          ggtitle("Scenario 1"))
+  # print( ggplot(D.frame2,aes(x=Date))+geom_line(aes(y=Hospitalized))+
+  #          geom_ribbon(aes(ymin=HospitalizedLower,ymax=HospitalizedUpper,alpha=0.5))+
+  #          ggtitle("Scenario 2"))
+  # print( ggplot(D.frame2,aes(x=Date))+geom_line(aes(y=Critical))+
+  #          geom_ribbon(aes(ymin=CriticalLower,ymax=CriticalUpper,alpha=0.5))+
+  #          ggtitle("Scenario 2"))
+  # print( ggplot(D.frame3,aes(x=Date))+geom_line(aes(y=Hospitalized))+
+  #          geom_ribbon(aes(ymin=HospitalizedLower,ymax=HospitalizedUpper,alpha=0.5))+
+  #          ggtitle("Scenario 3"))
+  # print( ggplot(D.frame3,aes(x=Date))+geom_line(aes(y=Critical))+
+  #          geom_ribbon(aes(ymin=CriticalLower,ymax=CriticalUpper,alpha=0.5))+
+  #          ggtitle("Scenario 3"))
+  # 
+  # 
   #-------------------------#
   
   # plt<-ggplot(D.frame1,aes(x=Date))+geom_line(aes(y=Hospitalized,color="Hospital Beds"))+

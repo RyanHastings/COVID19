@@ -15,12 +15,20 @@ for (t in 2:maxt) {
   # change Rt based time
   if (t<intervention_time) {
     Rt<-R0
+    Rhosp<-RhospPhaseOne
+    Rcrit<-RcritPhaseOne
   } else if (t>=intervention_time & t<lift_time1){
     Rt<-(1-intervention_R_rdxn)*R0
+    Rhosp<-RhospPhaseOne
+    Rcrit<-RcritPhaseOne
   } else if (t>=lift_time1 & t<lift_time2) {
     Rt<-(1-lift_rdxn1)*R0
+    Rhosp<-RhospPhaseTwo
+    Rcrit<-RcritPhaseTwo
   } else if (t>=lift_time2) {
     Rt<-(1-lift_rdxn2)*R0
+    Rhosp<-RhospPhaseTwo
+    Rcrit<-RcritPhaseTwo
   }
   
   term1<-Rt*S[t-1]*In[t-1]/(Tinf*N) #S[i,t-1]*In[i,t-1]/(Tinf*N[i])

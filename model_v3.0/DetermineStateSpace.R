@@ -30,9 +30,23 @@ intervention_R_rdxn_vec<-c(seq(0.0,0.7,0.05)) # field of NPI reduction rate over
 nvars<-4#13 # number of variables for output (you probably don't want to change this unless you want a huge coding headache)
 Npop<-6.692e6 # population of state
 R0<-3.0
-intervention_R_rdxn<-0.7
+PhaseOneReduction<-0.7
+PhaseTwoReductionA<-0.7
+PhaseTwoReductionB<-0.65
+PhaseThreeReduction_vec<-seq(0.35,0.7,0.05)
+PhaseFourReduction_vec<-seq(0.5,0.7,0.05)
+
+PhaseOneDate<-as.Date("2020-03-25")
+PhaseTwoDateA<-as.Date("2020-05-04")
+PhaseTwoDateB<-as.Date("2020-05-11")
+PhaseThreeDateA<-as.Date("2020-05-22")
+PhaseThreeDateB<-as.Date("2020-06-01")
+PhaseFourDate<-as.Date("2020-06-14")
+PhaseFiveDate<-as.Date("2020-07-04")
 
 Rdeath<-0.0066 # IFR (infection fatality rate)
+RhospPhaseOne<-0.03
+RcritPhaseOne<-0.012
 Rhosp_vec<-seq(0.025,0.09,0.005)#0.06 # hospitalization rate
 Rcrit_vec<-seq(0.01,0.04,0.001)#0.024 # critical rate
 
@@ -52,7 +66,7 @@ Pinf<-1.0 # max proportion of population to get infected
 
 outdir<-"StateSpace/" # directory for output
 output<-1 # produce output? 0=no, 1=yes.  Output produces is a csv with all of
-outfile<-'StateSpace_phase2.RData' # output filename
+outfile<-'StateSpace_phase3.RData' # output filename
 
 #######################################################################
 ########################## RUN THE MODEL ##############################
@@ -74,14 +88,14 @@ for (intervention_R_rdxn_i in 1:length(intervention_R_rdxn_vec)) {
     
             lift_rdxn1<-intervention_R_rdxn_vec[intervention_R_rdxn_i]
             lift_rdxn2<-intervention_R_rdxn_vec[intervention_R_rdxn_j]
-            Rhosp<-Rhosp_vec[Rhosp_vec_i]
-            Rcrit<-Rcrit_vec[Rcrit_vec_i]
+            RhospPhaseTwo<-Rhosp_vec[Rhosp_vec_i]
+            RcritPhaseTwo<-Rcrit_vec[Rcrit_vec_i]
             # to keep track of where we are in the simulation
             #print(paste("R0=",R0,",rdxn=",intervention_R_rdxn,",Rcrit=",Rcrit,"Rhosp=",Rhosp))#"intervention_time=",intervention_time,))#
                      # "Tinf=",Tinf,"Thosp=",Thosp,"Tdeath=",Tdeath
                      # ))
     
-            print(paste("lift1=",lift_rdxn1,",lift2=",lift_rdxn2,"Rcrit=",Rcrit,"Rhosp=",Rhosp))
+            print(paste("lift1=",lift_rdxn1,",lift2=",lift_rdxn2,"Rcrit=",RcritPhaseTwo,"Rhosp=",RhospPhaseTwo))
             source("DetermineStateSpace_initalization.R")
             source("DetermineStateSpace_dynamics.R")
             source("DetermineStateSpace_out.R")

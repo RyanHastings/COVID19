@@ -33,7 +33,7 @@ hosp_file<-"DeathCurves/EMResources_COVID_ICU_Snapshot_Edit_0506.csv"
 hosp_date1<-as.Date('2020-04-07')
 K=50
 dt=1.0
-outdir<-"out/20200512/"
+outdir<-"../../../COVID19Response/model_v3.0_out/out/20200521/"
 
 DeathByDayVar<-4
 HospTotVar<-1

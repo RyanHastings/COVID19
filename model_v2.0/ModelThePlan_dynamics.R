@@ -21,9 +21,9 @@ for (t in 2:maxt) {
   } else if (t>=PhaseFourT & t<PhaseFiveT) {
     Rt<-R0*(1-PhaseFourReduction)
   } else if (t>=PhaseFiveT) {
-    Rt<-R0
+    Rt<-R0*(1-PhaseFiveReduction)
   }
-  
+  print(Rt)
     
   term1<-Rt*S[t-1]*In[t-1]/(Tinf*N) #S[i,t-1]*In[i,t-1]/(Tinf*N[i])
     
